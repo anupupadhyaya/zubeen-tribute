@@ -212,7 +212,7 @@
     </div>
     <div style="margin-top:8px"><label class="small">District (Assam only)</label><select id="candleDistrict"></select></div>
     <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-      <button id="candleCancel" class="btn-ghost">Cancel</button>
+      <button type="button" id="candleCancel" class="btn-ghost">Cancel</button>
       <button id="candleSubmit" class="btn-primary">Light Candle</button>
     </div>
     <div id="candleMsg" class="muted" style="margin-top:8px"></div>
@@ -257,7 +257,8 @@
 
 <script>
 /* ---------- UTIL ---------- */
-const STORAGE_KEY = 'JOY_DATA_V3'; // Version bump for new structure
+const STORAGE_KEY = 'JOY_DATA_V4'; // Version bump
+const VISITED_KEY = 'JOY_VISITED_V1'; // Key for welcome popup
 function loadData(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {candles:[],memories:[]} } catch(e){ return {candles:[],memories:[]} } }
 function saveData(d){ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 function formatN(n){ return n.toLocaleString(); }
@@ -282,168 +283,140 @@ const COUNTRIES = ["India","United States","United Kingdom","Canada","Australia"
 const INDIA_STATES = ["Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"];
 const ASSAM_DISTRICTS = ["Bajali", "Baksa", "Barpeta", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tinsukia", "Udalguri", "West Karbi Anglong"];
 
-// --- NEW: Coordinate data for accurate map pins ---
+/* ---------- COORDINATE DATA ---------- */
 const COUNTRY_COORDS = { "India": [20.5937, 78.9629], "United States": [38.9637, -95.7129], "United Kingdom": [55.3781, -3.4360], "Canada": [56.1304, -106.3468], "Australia": [-25.2744, 133.7751], "Bangladesh": [23.6850, 90.3563], "Nepal": [28.3949, 84.1240], "Bhutan": [27.5142, 90.4336], "United Arab Emirates": [23.4241, 53.8478], "Singapore": [1.3521, 103.8198], "Malaysia": [4.2105, 101.9758], "Germany": [51.1657, 10.4515], "France": [46.6031, 1.8883], "Others": [20, 20] };
 const STATE_COORDS = { "Andaman and Nicobar Islands": [11.7401, 92.6586], "Andhra Pradesh": [15.9129, 79.7400], "Arunachal Pradesh": [28.2180, 94.7278], "Assam": [26.2006, 92.9376], "Bihar": [25.0961, 85.3131], "Chandigarh": [30.7333, 76.7794], "Chhattisgarh": [21.2787, 81.8661], "Dadra and Nagar Haveli and Daman & Diu": [20.1809, 73.0169], "Delhi": [28.7041, 77.1025], "Goa": [15.2993, 74.1240], "Gujarat": [22.2587, 71.1924], "Haryana": [29.0588, 76.0856], "Himachal Pradesh": [31.1048, 77.1734], "Jammu & Kashmir": [33.7782, 76.5762], "Jharkhand": [23.6102, 85.2799], "Karnataka": [15.3173, 75.7139], "Kerala": [10.8505, 76.2711], "Ladakh": [34.1526, 77.5771], "Lakshadweep": [10.5667, 72.6417], "Madhya Pradesh": [22.9734, 78.6569], "Maharashtra": [19.7515, 75.7139], "Manipur": [24.6637, 93.9063], "Meghalaya": [25.4670, 91.3662], "Mizoram": [23.1645, 92.9376], "Nagaland": [26.1584, 94.5624], "Odisha": [20.9517, 85.0985], "Puducherry": [11.9416, 79.8083], "Punjab": [31.1471, 75.3412], "Rajasthan": [27.0238, 74.2179], "Sikkim": [27.5330, 88.5122], "Tamil Nadu": [11.1271, 78.6569], "Telangana": [18.1124, 79.0193], "Tripura": [23.9408, 91.9882], "Uttar Pradesh": [26.8467, 80.9462], "Uttarakhand": [30.0668, 79.0193], "West Bengal": [22.9868, 87.8550] };
-const DISTRICT_COORDS = { "Bajali": [26.4913, 91.1734], "Baksa": [26.7610, 91.3507], "Barpeta": [26.3273, 91.0083], "Bongaigaon": [26.4716, 90.5601], "Cachar": [24.8333, 92.8000], "Charaideo": [27.0984, 95.1438], "Chirang": [26.6500, 90.6500], "Darrang": [26.4673, 92.1643], "Dhemaji": [27.4833, 94.5833], "Dhubri": [26.0271, 89.9740], "Dibrugarh": [27.4728, 94.9113], "Dima Hasao": [25.3857, 92.9118], "Goalpara": [26.17 Goalpara, 90.62], "Golaghat": [26.5167, 93.9667], "Hailakandi": [24.6833, 92.5667], "Jorhat": [26.7500, 94.2167], "Kamrup": [26.1667, 91.7500], "Kamrup Metropolitan": [26.1445, 91.7362], "Karbi Anglong": [26.1685, 93.5878], "Karimganj": [24.8667, 92.3500], "Kokrajhar": [26.4000, 90.2667], "Lakhimpur": [27.2333, 94.1167], "Majuli": [27.0160, 94.2160], "Morigaon": [26.2500, 92.3333], "Nagaon": [26.3500, 92.6833], "Nalbari": [26.4500, 91.4333], "Sivasagar": [27.0000, 94.6333], "Sonitpur": [26.6347, 92.7923], "South Salmara-Mankachar": [25.8078, 89.9011], "Tinsukia": [27.4914, 95.3619], "Udalguri": [26.7667, 92.1000], "West Karbi Anglong": [25.8617, 92.8364] };
+const DISTRICT_COORDS = { "Bajali": [26.4913, 91.1734], "Baksa": [26.7610, 91.3507], "Barpeta": [26.3273, 91.0083], "Bongaigaon": [26.4716, 90.5601], "Cachar": [24.8333, 92.8000], "Charaideo": [27.0984, 95.1438], "Chirang": [26.6500, 90.6500], "Darrang": [26.4673, 92.1643], "Dhemaji": [27.4833, 94.5833], "Dhubri": [26.0271, 89.9740], "Dibrugarh": [27.4728, 94.9113], "Dima Hasao": [25.3857, 92.9118], "Goalpara": [26.17, 90.62], "Golaghat": [26.5167, 93.9667], "Hailakandi": [24.6833, 92.5667], "Jorhat": [26.7500, 94.2167], "Kamrup": [26.1667, 91.7500], "Kamrup Metropolitan": [26.1445, 91.7362], "Karbi Anglong": [26.1685, 93.5878], "Karimganj": [24.8667, 92.3500], "Kokrajhar": [26.4000, 90.2667], "Lakhimpur": [27.2333, 94.1167], "Majuli": [27.0160, 94.2160], "Morigaon": [26.2500, 92.3333], "Nagaon": [26.3500, 92.6833], "Nalbari": [26.4500, 91.4333], "Sivasagar": [27.0000, 94.6333], "Sonitpur": [26.6347, 92.7923], "South Salmara-Mankachar": [25.8078, 89.9011], "Tinsukia": [27.4914, 95.3619], "Udalguri": [26.7667, 92.1000], "West Karbi Anglong": [25.8617, 92.8364] };
 
 /* ---------- UI wiring ---------- */
 const modeToggle = document.getElementById('modeToggle');
 const modeLabel = document.getElementById('modeLabel');
-let isDark = false;
-function setMode(d){ isDark = d; document.documentElement.classList.toggle('dark', d); document.body.classList.toggle('dark', d); modeLabel.textContent = d ? 'Dark Mode' : 'Light Mode'; }
-modeToggle.onclick = ()=> setMode(!isDark);
+function setMode(d){ document.documentElement.classList.toggle('dark', d); document.body.classList.toggle('dark', d); modeLabel.textContent = d ? 'Dark Mode' : 'Light Mode'; }
+modeToggle.onclick = ()=> setMode(document.documentElement.classList.contains('dark'));
 setMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-document.getElementById('clearLocal').onclick = ()=>{ if(!confirm('This will clear all candles and memories from your browser\'s storage. Are you sure?')) return; JOY = {candles:[],memories:[]}; saveData(JOY); location.reload(); };
+document.getElementById('clearLocal').onclick = ()=>{ if(!confirm('This will clear all data from your browser\'s storage. Are you sure?')) return; localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(VISITED_KEY); location.reload(); };
+
+/* ---------- Modals: Get Elements ---------- */
+const candleModal = document.getElementById('candleModal');
+const memoryModal = document.getElementById('memoryModal');
+const contactModal = document.getElementById('contactModal');
 
 /* ---------- Candle Modal Logic ---------- */
-const candleModal = document.getElementById('candleModal');
 const openCandleModal = document.getElementById('openCandleModal');
 const candleCountry = document.getElementById('candleCountry');
 const candleState = document.getElementById('candleState');
 const candleDistrict = document.getElementById('candleDistrict');
 const candleName = document.getElementById('candleName');
 const candleSubmit = document.getElementById('candleSubmit');
-const candleCancel = document.getElementById('candleCancel');
-const candleMsg = document.getElementById('candleMsg');
-
-function populateDropdowns(){ /* ... (omitted for brevity, code is identical) ... */ }
-populateDropdowns();
-// ... (omitted for brevity, dropdown and candle submission logic is identical to previous version) ...
+openCandleModal.onclick = () => { candleModal.style.display = 'flex'; candleName.value=''; candleCountry.value='India';candleState.value=''; candleDistrict.value=''; candleState.disabled=false;candleDistrict.style.display='none';};
+document.getElementById('candleCancel').onclick = ()=> candleModal.style.display='none';
+// ... rest of candle logic
 
 /* ---------- Memory Modal Logic ---------- */
-const memoryModal = document.getElementById('memoryModal');
 const openMemoryForm = document.getElementById('openMemoryForm');
 const memoryForm = document.getElementById('memoryForm');
-// ... (omitted for brevity, logic is identical) ...
+const memCountry = document.getElementById('memCountry');
+const memState = document.getElementById('memState');
+openMemoryForm.onclick = ()=> { memoryModal.style.display='flex'; memoryForm.reset(); memCountry.value = 'India'; memState.disabled = false; };
+document.getElementById('memoryCancel').onclick = ()=> memoryModal.style.display='none';
+// ... rest of memory logic
+
+/* ---------- Contact Modal Logic (FIXED) ---------- */
+document.getElementById('openContactModalBtn').onclick = () => { contactModal.style.display = 'flex'; };
+document.getElementById('contactCancel').onclick = () => { contactModal.style.display = 'none'; };
+
 
 /* ---------- Map & Leaflet ---------- */
 const map = L.map('map', { attributionControl:false }).setView([26.2006, 92.9376], 5); // Centered on Assam
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 let markersLayer = L.layerGroup().addTo(map);
 
-// --- REWRITTEN: Function now uses coordinate objects for accuracy ---
 function getCoords(entry) {
-    if (entry.district && DISTRICT_COORDS[entry.district]) {
-        return DISTRICT_COORDS[entry.district];
-    }
-    if (entry.state && STATE_COORDS[entry.state]) {
-        return STATE_COORDS[entry.state];
-    }
-    if (entry.country && COUNTRY_COORDS[entry.country]) {
-        return COUNTRY_COORDS[entry.country];
-    }
-    return null; // No location found
+    if (entry.district && DISTRICT_COORDS[entry.district]) return DISTRICT_COORDS[entry.district];
+    if (entry.state && STATE_COORDS[entry.state]) return STATE_COORDS[entry.state];
+    if (entry.country && COUNTRY_COORDS[entry.country]) return COUNTRY_COORDS[entry.country];
+    return null;
 }
+//... other functions
 
-function renderMapPins(){
-  markersLayer.clearLayers();
-  const addMarker = (coords, popupText, options = {}) => {
-      const marker = options.isCandle ? L.circleMarker(coords, {radius:6, color:'#ffb347', fillOpacity: 0.8, weight: 1}) : L.marker(coords);
-      marker.bindPopup(popupText); markersLayer.addLayer(marker);
-  };
-  
-  JOY.memories.forEach(m => {
-    let coords = getCoords(m);
-    if(coords){
-      // CHANGED: Added institute to map popup
-      const locationInfo = [m.city, m.institute].filter(Boolean).join(' • ');
-      const popupHTML = `<strong>${escapeHtml(m.name)}</strong><div class="small">${escapeHtml(locationInfo)}</div><div style="margin-top:6px">${escapeHtml(truncate(m.text,100))}</div>`;
-      addMarker(coords, popupHTML);
-    }
-  });
+/* ---------- FULL SCRIPT (ALL FUNCTIONS) ---------- */
+// This section contains all functions for rendering, event handling, etc.
 
-  JOY.candles.forEach(c => {
-    let coords = getCoords(c);
-    if(coords){
-      // CHANGED: Added more details to candle popup
-      const locationInfo = [c.district, c.state, c.country].filter(Boolean).join(', ');
-      const popupHTML = `<strong>Candle by ${escapeHtml(c.name)}</strong><div class="small">From: ${escapeHtml(locationInfo)}</div>`;
-      addMarker(coords, popupHTML, {isCandle: true});
-    }
-  });
-}
-
-/* ---------- Charts & Renders ---------- */
-const candleCtx = document.getElementById('candleChart').getContext('2d');
-let candleChart = new Chart(candleCtx, { type:'bar', data: { labels:[], datasets:[{label:'Candles',data:[], backgroundColor:['#f59e0b','#60a5fa','#93c5fd','#34d399','#a3a3a3']}] }, options:{responsive:true, maintainAspectRatio: false, plugins:{legend:{display:false}}, indexAxis: 'y'} });
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function truncate(s,l){ return s.length>l? s.slice(0,l)+'...': s; }
-function renderMedia(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, url => {
-        if (/\.(jpg|jpeg|png|gif)$/i.test(url)) return `<div class="memory-embed"><img src="${escapeHtml(url)}" loading="lazy"></div>`;
-        const yMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-        if (yMatch) return `<div class="memory-embed"><iframe src="https://www.youtube.com/embed/${yMatch[1]}" frameborder="0" allowfullscreen></iframe></div>`;
-        return `<a href="${escapeHtml(url)}" target="_blank">${escapeHtml(url)}</a>`;
-    });
-}
-function renderAll(){
-  candleCountEl.textContent = formatN(JOY.candles.length); statCandles.textContent = formatN(JOY.candles.length);
-  memoryCountEl.textContent = formatN(JOY.memories.length); statMemories.textContent = formatN(JOY.memories.length);
-  candleArea.innerHTML = Array.from({length: Math.min(JOY.candles.length, 100)}, () => '<div class="candle"></div>').join('');
-  
-  memoryWall.innerHTML = !JOY.memories.length ? '<div class="muted" style="padding:12px;">No memories yet.</div>' : JOY.memories.slice().reverse().map(m => {
-    // CHANGED: Display both city and institute
-    const locationInfo = [m.city, m.institute].filter(Boolean).join(' • ');
-    return `<div style="padding:8px 6px;border-bottom:1px solid var(--glass);"><div><strong>${escapeHtml(m.name)}</strong> <span class="muted">• ${escapeHtml(locationInfo)}</span></div><div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;">${renderMedia(escapeHtml(m.text||''))}</div></div>`;
-  }).join('');
-  
-  renderMapPins();
-  
-  const getTopN = (counts, n=5) => Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n);
-  const countryC = JOY.candles.reduce((a,c)=>{a[c.country]=(a[c.country]||0)+1;return a;},{});
-  const stateC = JOY.candles.reduce((a,c)=>{if(c.state)a[c.state]=(a[c.state]||0)+1;return a;},{});
-  const districtC = JOY.candles.reduce((a,c)=>{if(c.district)a[c.district]=(a[c.district]||0)+1;return a;},{});
-  
-  const topCountries = getTopN(countryC); candleChart.data.labels=topCountries.map(c=>c[0]); candleChart.data.datasets[0].data=topCountries.map(c=>c[1]); candleChart.update();
-  topStateEl.textContent = getTopN(stateC,1)[0] ? `${getTopN(stateC,1)[0][0]} (${getTopN(stateC,1)[0][1]})` : '—';
-  topDistrictEl.textContent = getTopN(districtC,1)[0] ? `${getTopN(districtC,1)[0][0]} (${getTopN(districtC,1)[0][1]})` : '—';
-  topCountryEl.textContent = getTopN(countryC,1)[0] ? `${getTopN(countryC,1)[0][0]} (${getTopN(countryC,1)[0][1]})` : '—';
-  
-  topStatesList.innerHTML = getTopN(stateC).length ? getTopN(stateC).map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') : '<li class="muted">No data</li>';
-  topDistrictsList.innerHTML = getTopN(districtC).length ? getTopN(districtC).map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') : '<li class="muted">No data</li>';
-  
-  countryCountEl.textContent = new Set(JOY.memories.map(m=>m.country).concat(JOY.candles.map(c=>c.country)).filter(Boolean)).size;
-  saveData(JOY);
-}
-
-
-/* ---------- Contact & Suggestion Logic (Identical to previous version) ---------- */
-const suggestionForm = document.getElementById('suggestionForm');
-const contactModal = document.getElementById('contactModal');
-const contactForm = document.getElementById('contactForm');
-suggestionForm.addEventListener('submit', function(e) { e.preventDefault(); const suggestionText = e.target.suggestion.value; window.location.href = `mailto:joyzubeenda@gmail.com?subject=${encodeURIComponent("Suggestion for JoyZubeenda Website")}&body=${encodeURIComponent(suggestionText)}`; });
-document.getElementById('openContactModalBtn').addEventListener('click', () => { contactModal.style.display = 'flex'; });
-document.getElementById('contactCancel').addEventListener('click', () => { contactModal.style.display = 'none'; });
-contactForm.addEventListener('submit', function(e) { e.preventDefault(); const name = e.target.contact_name.value; const email = e.target.contact_email.value; const mobile = e.target.contact_mobile.value; const message = e.target.contact_message.value; const subject = `Contact Form Submission from ${name}`; const body = `Name: ${name}\nEmail: ${email}\nMobile: ${mobile}\n\nMessage:\n${message}`; window.location.href = `mailto:joyzubeenda@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; contactModal.style.display = 'none'; });
-
-
-/* ---------- Init and Global Listeners (abbreviated) ---------- */
-// NOTE: I've abbreviated the identical functions from the previous versions for clarity here.
-// The full script block below contains the complete, unabbreviated code.
 function populateDropdowns(){
   const memCountry = document.getElementById('memCountry'); const memState = document.getElementById('memState');
   ['candleCountry', 'memCountry'].forEach(id => { const select = document.getElementById(id); select.innerHTML = ''; COUNTRIES.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; select.appendChild(o); }); });
   [candleState, memState].forEach(select => { select.innerHTML = ''; const d = document.createElement('option'); d.value = ''; d.textContent = 'Select state'; select.appendChild(d); INDIA_STATES.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; select.appendChild(o); }); });
   candleDistrict.innerHTML = ''; const d = document.createElement('option'); d.value=''; d.textContent='Select district'; candleDistrict.appendChild(d); ASSAM_DISTRICTS.forEach(dist => { const o=document.createElement('option'); o.value=dist; o.textContent=dist; candleDistrict.appendChild(o); });
 }
+
 candleCountry.addEventListener('change', () => { const isIndia = candleCountry.value === 'India'; candleState.disabled = !isIndia; candleDistrict.disabled = !isIndia; if (!isIndia) { candleState.value = ''; candleDistrict.value = ''; candleDistrict.style.display = 'none'; } });
 candleState.addEventListener('change', ()=> { candleDistrict.style.display = (candleState.value === 'Assam') ? 'block' : 'none'; if (candleState.value !== 'Assam') { candleDistrict.value = ''; } });
-openCandleModal.onclick = () => { candleMsg.textContent = ''; candleName.value = ''; candleCountry.value = 'India'; candleState.value = ''; candleDistrict.value = ''; candleState.disabled = false; candleDistrict.style.display = 'none'; candleDistrict.disabled = false; candleModal.style.display = 'flex'; };
-candleCancel.onclick = ()=> candleModal.style.display='none';
 async function getVisitorIP(){ try{ const r = await fetch('https://api.ipify.org?format=json'); const j = await r.json(); return j.ip; }catch(e){ return null; } }
-async function canLight(ip){ return !localStorage.getItem('JOY_CANDLE_LIT'); }
-function markLit(ip){ localStorage.setItem('JOY_CANDLE_LIT', 'true'); }
-candleSubmit.onclick = async ()=>{ candleMsg.textContent = 'Processing...'; candleSubmit.disabled = true; const ip = await getVisitorIP(); if(!await canLight(ip)){ candleMsg.textContent = 'Thank you, but you have already lit a candle.'; candleSubmit.disabled=false; return; } const entry = { id: Date.now(), name: candleName.value.trim() || 'Anonymous', country: candleCountry.value || 'India', state: candleState.value || '', district: candleDistrict.value || '', ts: new Date().toISOString() }; JOY.candles.push(entry); saveData(JOY); markLit(ip); candleModal.style.display = 'none'; renderAll(); const el = document.createElement('div'); el.className='candle glow'; candleArea.prepend(el); setTimeout(()=> el.classList.remove('glow'), 2200); candleSubmit.disabled = false; };
-const memCountry = document.getElementById('memCountry'); const memState = document.getElementById('memState');
+async function canLight(){ return !localStorage.getItem('JOY_CANDLE_LIT'); }
+function markLit(){ localStorage.setItem('JOY_CANDLE_LIT', 'true'); }
+candleSubmit.onclick = async ()=>{ candleMsg.textContent = 'Processing...'; candleSubmit.disabled = true; if(!await canLight()){ candleMsg.textContent = 'Thank you, but you have already lit a candle.'; candleSubmit.disabled=false; return; } const entry = { id: Date.now(), name: candleName.value.trim() || 'Anonymous', country: candleCountry.value || 'India', state: candleState.value || '', district: candleDistrict.value || '', ts: new Date().toISOString() }; JOY.candles.push(entry); saveData(JOY); markLit(); candleModal.style.display = 'none'; renderAll(); const el = document.createElement('div'); el.className='candle glow'; candleArea.prepend(el); setTimeout(()=> el.classList.remove('glow'), 2200); candleSubmit.disabled = false; };
 memCountry.addEventListener('change', () => { const isIndia = memCountry.value === 'India'; memState.disabled = !isIndia; if (!isIndia) { memState.value = ''; } });
-openMemoryForm.onclick = ()=> { memoryForm.reset(); memoryMsg.textContent=''; memoryModal.style.display='flex'; memCountry.value = 'India'; memState.value = ''; memState.disabled = false; };
-memoryCancel.onclick = ()=> memoryModal.style.display='none';
 memoryForm.addEventListener('submit', (ev)=>{ ev.preventDefault(); const fd = new FormData(memoryForm); if (!fd.get('text').trim()) { memoryMsg.textContent = 'Please write a memory before submitting.'; return; } const obj = { id: Date.now(), name: fd.get('name') || 'Anonymous', email: fd.get('email') || '', city: fd.get('city') || '', institute: fd.get('institute') || '', country: fd.get('country') || 'India', state: fd.get('state') || '', text: fd.get('text') || '', ts: new Date().toISOString() }; JOY.memories.push(obj); saveData(JOY); memoryModal.style.display = 'none'; renderAll(); });
+const suggestionForm = document.getElementById('suggestionForm');
+const contactForm = document.getElementById('contactForm');
+suggestionForm.addEventListener('submit', function(e) { e.preventDefault(); const suggestionText = e.target.suggestion.value; window.location.href = `mailto:joyzubeenda@gmail.com?subject=${encodeURIComponent("Suggestion for JoyZubeenda Website")}&body=${encodeURIComponent(suggestionText)}`; });
+contactForm.addEventListener('submit', function(e) { e.preventDefault(); const name = e.target.contact_name.value; const email = e.target.contact_email.value; const mobile = e.target.contact_mobile.value; const message = e.target.contact_message.value; const subject = `Contact Form Submission from ${name}`; const body = `Name: ${name}\nEmail: ${email}\nMobile: ${mobile}\n\nMessage:\n${message}`; window.location.href = `mailto:joyzubeenda@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; contactModal.style.display = 'none'; });
 
-(function init(){ renderAll(); console.log('Joy Zubeen tribute site loaded.'); })();
-window.addEventListener('keydown', (e)=> { if(e.key==='Escape'){ candleModal.style.display='none'; memoryModal.style.display='none'; contactModal.style.display='none'; }});
+const candleCtx = document.getElementById('candleChart').getContext('2d');
+let candleChart = new Chart(candleCtx, { type:'bar', data: { labels:[], datasets:[{label:'Candles',data:[], backgroundColor:['#f59e0b','#60a5fa','#93c5fd','#34d399','#a3a3a3']}] }, options:{responsive:true, maintainAspectRatio: false, plugins:{legend:{display:false}}, indexAxis: 'y'} });
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function truncate(s,l){ return s.length>l? s.slice(0,l)+'...': s; }
+function renderMedia(text) { const urlRegex = /(https?:\/\/[^\s]+)/g; return text.replace(urlRegex, url => { if (/\.(jpg|jpeg|png|gif)$/i.test(url)) return `<div class="memory-embed"><img src="${escapeHtml(url)}" loading="lazy"></div>`; const yMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/); if (yMatch) return `<div class="memory-embed"><iframe src="https://www.youtube.com/embed/${yMatch[1]}" frameborder="0" allowfullscreen></iframe></div>`; return `<a href="${escapeHtml(url)}" target="_blank">${escapeHtml(url)}</a>`; }); }
+function renderMapPins(){
+  markersLayer.clearLayers();
+  const addMarker = (coords, popupText, options = {}) => { const marker = options.isCandle ? L.circleMarker(coords, {radius:6, color:'#ffb347', fillOpacity: 0.8, weight: 1}) : L.marker(coords); marker.bindPopup(popupText); markersLayer.addLayer(marker); };
+  JOY.memories.forEach(m => { let coords = getCoords(m); if(coords){ const locationInfo = [m.city, m.institute].filter(Boolean).join(' • '); const popupHTML = `<strong>${escapeHtml(m.name)}</strong><div class="small">${escapeHtml(locationInfo)}</div><div style="margin-top:6px">${escapeHtml(truncate(m.text,100))}</div>`; addMarker(coords, popupHTML); } });
+  JOY.candles.forEach(c => { let coords = getCoords(c); if(coords){ const locationInfo = [c.district, c.state, c.country].filter(Boolean).join(', '); const popupHTML = `<strong>Candle by ${escapeHtml(c.name)}</strong><div class="small">From: ${escapeHtml(locationInfo)}</div>`; addMarker(coords, popupHTML, {isCandle: true}); } });
+}
+function renderAll(){
+  candleCountEl.textContent = formatN(JOY.candles.length); statCandles.textContent = formatN(JOY.candles.length);
+  memoryCountEl.textContent = formatN(JOY.memories.length); statMemories.textContent = formatN(JOY.memories.length);
+  candleArea.innerHTML = Array.from({length: Math.min(JOY.candles.length, 100)}, () => '<div class="candle"></div>').join('');
+  memoryWall.innerHTML = !JOY.memories.length ? '<div class="muted" style="padding:12px;">No memories yet.</div>' : JOY.memories.slice().reverse().map(m => { const locationInfo = [m.city, m.institute].filter(Boolean).join(' • '); return `<div style="padding:8px 6px;border-bottom:1px solid var(--glass);"><div><strong>${escapeHtml(m.name)}</strong> <span class="muted">• ${escapeHtml(locationInfo)}</span></div><div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;">${renderMedia(escapeHtml(m.text||''))}</div></div>`; }).join('');
+  renderMapPins();
+  const getTopN = (counts, n=5) => Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const countryC = JOY.candles.reduce((a,c)=>{a[c.country]=(a[c.country]||0)+1;return a;},{});
+  const stateC = JOY.candles.reduce((a,c)=>{if(c.state)a[c.state]=(a[c.state]||0)+1;return a;},{});
+  const districtC = JOY.candles.reduce((a,c)=>{if(c.district)a[c.district]=(a[c.district]||0)+1;return a;},{});
+  const topCountries = getTopN(countryC); candleChart.data.labels=topCountries.map(c=>c[0]); candleChart.data.datasets[0].data=topCountries.map(c=>c[1]); candleChart.update();
+  topStateEl.textContent = getTopN(stateC,1)[0] ? `${getTopN(stateC,1)[0][0]} (${getTopN(stateC,1)[0][1]})` : '—';
+  topDistrictEl.textContent = getTopN(districtC,1)[0] ? `${getTopN(districtC,1)[0][0]} (${getTopN(districtC,1)[0][1]})` : '—';
+  topCountryEl.textContent = getTopN(countryC,1)[0] ? `${getTopN(countryC,1)[0][0]} (${getTopN(countryC,1)[0][1]})` : '—';
+  topStatesList.innerHTML = getTopN(stateC).length ? getTopN(stateC).map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') : '<li class="muted">No data</li>';
+  topDistrictsList.innerHTML = getTopN(districtC).length ? getTopN(districtC).map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') : '<li class="muted">No data</li>';
+  countryCountEl.textContent = new Set(JOY.memories.map(m=>m.country).concat(JOY.candles.map(c=>c.country)).filter(Boolean)).size;
+  saveData(JOY);
+}
+
+// ---------- Initialize Page and Global Listeners ----------
+function init(){
+    populateDropdowns();
+    renderAll();
+    // NEW: Show welcome modal on first visit
+    if (!localStorage.getItem(VISITED_KEY)) {
+        setTimeout(() => { // Use a small delay to let the page render first
+            memoryModal.style.display = 'flex';
+            localStorage.setItem(VISITED_KEY, 'true');
+        }, 1500);
+    }
+    console.log('Joy Zubeen tribute site loaded.');
+}
+
+init();
+
+window.addEventListener('keydown', (e)=> {
+    if(e.key === 'Escape'){
+        candleModal.style.display='none';
+        memoryModal.style.display='none';
+        contactModal.style.display='none';
+    }
+});
+
 </script>
 </body>
 </html>
