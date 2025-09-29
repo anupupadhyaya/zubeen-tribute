@@ -1,233 +1,417 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Joy Zubeenda — A Tribute to Zubeen Garg</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Living Tribute to Zubeen Garg</title>
+    <style>
+        /* Basic CSS Reset and Global Styles */
+        :root {
+            --primary-color: #333;
+            --secondary-color: #7a0019; /* A respectful maroon */
+            --background-color: #f4f4f4;
+            --card-background: #ffffff;
+            --font-family: 'Helvetica Neue', Arial, sans-serif;
+            --header-font: 'Georgia', serif;
+        }
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+        }
+       .container {
+            max-width: 1100px;
+            margin: auto;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+        h1, h2, h3 {
+            font-family: var(--header-font);
+            color: var(--primary-color);
+        }
+        p {
+            margin-bottom: 1rem;
+        }
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
 
-  <!-- Leaflet (map) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        /* Header and Navigation */
+       .main-header {
+            background: var(--card-background);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+       .main-header.container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+       .main-header.logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: var(--header-font);
+        }
+       .main-nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+       .main-nav ul li {
+            margin-left: 20px;
+        }
+       .main-nav ul li a {
+            padding: 5px 10px;
+            transition: color 0.3s ease;
+        }
+       .main-nav ul li a:hover {
+            color: #000;
+            font-weight: bold;
+        }
 
-  <!-- Simple icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+        /* Hero Section */
+       .hero {
+            background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('[https://via.placeholder.com/1500x600.png/f4f4f4/cccccc?text=Zubeen+Garg](https://via.placeholder.com/1500x600.png/f4f4f4/cccccc?text=Zubeen+Garg)') no-repeat center center/cover;
+            /* ACTION REQUIRED: Replace the placeholder URL above with a high-quality, respectful image of Zubeen Garg. */
+            text-align: center;
+            padding: 4rem 0;
+        }
+       .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+       .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
 
-  <style>
-    /* ---------- Light mode theme ---------- */
-    :root{
-      --accent:#2563eb;
-      --accent-2:#3b82f6;
-      --bg:#f9fafb;
-      --card:#ffffff;
-      --muted:#555;
-      --glass: rgba(0,0,0,0.03);
-      --max-width:1100px;
-      --font-sans: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    }
-    html,body{height:100%;margin:0;padding:0;}
-    body{
-      background: var(--bg);
-      color:#111;
-      font-family:var(--font-sans);
-      line-height:1.5;
-      padding:20px;
-      display:flex;
-      justify-content:center;
-      box-sizing:border-box;
-    }
-    .wrap{max-width:var(--max-width);width:100%;}
-    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{
-      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));font-weight:700;font-size:20px;color:#fff;
-      box-shadow:0 4px 12px rgba(37,99,235,0.25);
-    }
-    h1{margin:0;font-size:24px}
-    p.lead{margin:6px 0 0;color:var(--muted)}
+        /* Section Styling */
+       .section {
+            padding: 4rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+       .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+       .section-intro {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+            font-size: 1.1rem;
+        }
 
-    /* ---------- grid ---------- */
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
-    @media (max-width:980px){ .grid{grid-template-columns:1fr} .right-col{order:2} }
+        /* Card and Grid Layouts */
+       .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+       .card {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+       .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+       .card h3 {
+            margin-top: 0;
+        }
 
-    /* ---------- card ---------- */
-    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
-    .small{font-size:13px;color:var(--muted)}
+        /* Specific Section: Music */
+       .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+       .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+       .album-art {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
 
-    /* ---------- sections ---------- */
-    .section-title{font-size:20px;font-weight:600;margin-bottom:8px}
+        /* Specific Section: Map and Gallery */
+       .map-container,.gallery-container {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #e9e9e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #666;
+        }
 
-    /* ---------- form ---------- */
-    form input, form textarea{
-      width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;
-      font-family:inherit;font-size:14px;
-    }
-    form .row{display:flex;gap:8px}
+        /* Specific Section: Contribution Form */
+       .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+       .form-group {
+            margin-bottom: 1.5rem;
+        }
+       .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+       .form-group input,.form-group select,.form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+       .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+       .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--secondary-color);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+       .btn-submit:hover {
+            background-color: #5a0012;
+        }
+       .privacy-notice {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-left: 3px solid var(--secondary-color);
+        }
+       .consent-group {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 1rem;
+        }
+       .consent-group input {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
 
-    /* ---------- candles ---------- */
-    .virtual-candles{display:flex;gap:6px;flex-wrap:wrap}
-    .candle{width:14px;height:36px;border-radius:6px;background:linear-gradient(180deg,#ffdd88,#ffb347);position:relative;box-shadow:0 6px 18px rgba(255,120,40,0.2)}
-    .candle:after{content:'';position:absolute;left:50%;transform:translateX(-50%);top:-8px;width:4px;height:8px;border-radius:6px;background:#ffd;box-shadow:0 6px 18px rgba(255,200,60,0.25)}
+        /* Footer */
+       .main-footer {
+            background: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+       .main-footer a {
+            color: #fff;
+            text-decoration: underline;
+        }
 
-    footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-    .btn{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:white;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid #ccc;color:#333}
-    .pill{background:rgba(0,0,0,0.05);padding:6px 8px;border-radius:999px;font-size:13px}
-  </style>
+        /* Responsive Design */
+        @media (max-width: 768px) {
+           .main-header.container {
+                flex-direction: column;
+            }
+           .main-nav ul {
+                margin-top: 1rem;
+            }
+           .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo">JZ</div>
-        <div>
-          <h1>Joy Zubeenda — A Tribute to Zubeen Garg</h1>
-          <p class="lead">A living, fan-curated memorial — memories, music, map, and creative tributes.</p>
+
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">Joy Zubeen Da</div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#music">The Music</a></li>
+                    <li><a href="#map">Global Memories</a></li>
+                    <li><a href="#gallery">Fan Gallery</a></li>
+                    <li><a href="#contribute">Share Your Story</a></li>
+                </ul>
+            </nav>
         </div>
-      </div>
     </header>
 
-    <div class="grid">
-      <!-- MAIN COLUMN -->
-      <main>
-        <!-- FAN SPOTLIGHT -->
-        <section class="card">
-          <h2 class="section-title">🌟 Fan Spotlight of the Week</h2>
-          <p><em>“I first heard Zubeen-da’s Ya Ali in my hostel room. It gave me goosebumps and became the anthem of my youth.”</em> — Rahul, Jorhat</p>
-        </section>
-
-        <!-- HERO + BUTTONS -->
-        <section class="card" style="margin-top:16px">
-          <h2 class="section-title">Contribute & Celebrate</h2>
-          <p class="small">Add your memory, cover, art, or poem. Light a candle. Pin your city. Together we build #JoyZubeen.</p>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn" id="light-candle">🕯️ Light Candle</button>
-            <button class="btn ghost" id="open-contribute">✍️ Submit Tribute</button>
-            <button class="btn ghost" id="go-to-map">🌍 Legacy Map</button>
-          </div>
-        </section>
-
-        <!-- TRIBUTE NIGHTS -->
-        <section class="card" style="margin-top:16px">
-          <h2 class="section-title">🎤 Themed Tribute Nights</h2>
-          <ul>
-            <li>Covers Night — Fans perform Zubeen’s songs</li>
-            <li>Remix Night — DJs & producers share their takes</li>
-            <li>Poems & Memories — Emotional fan readings</li>
-          </ul>
-          <p class="small">Livestreams will be embedded here on event days.</p>
-        </section>
-
-        <!-- FAN SUBMISSION FORM -->
-        <section class="card" style="margin-top:16px">
-          <h2 class="section-title">📩 Share Your Tribute</h2>
-          <form id="fan-form">
-            <div class="row">
-              <input type="text" name="name" placeholder="Your Name" required>
-              <input type="text" name="profession" placeholder="Profession">
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Zubeen Garg</h1>
+                <p>A Living Tribute to the Voice of Assam. His music is not a memory, but a legacy that lives on in millions of hearts.</p>
             </div>
-            <div class="row" style="margin-top:8px">
-              <input type="email" name="email" placeholder="Email" required>
-              <input type="tel" name="mobile" placeholder="Mobile">
+        </section>
+
+        <section id="about" class="section">
+            <div class="container">
+                <h2 class="section-title">An Enduring Legacy</h2>
+                <p class="section-intro">Zubeen Garg was more than a singer; he was a cultural icon who revolutionized music, blending folk traditions with modern sounds. His voice became the soundtrack to our lives—celebrating our joys, soothing our sorrows, and defining a generation. This space is dedicated to celebrating his life and the profound impact he continues to have on all of us.</p>
             </div>
-            <textarea name="memory" rows="4" style="margin-top:8px" placeholder="Write your memory, poem, or tribute..." required></textarea>
-            <button class="btn" type="submit" style="margin-top:10px">Submit Tribute</button>
-          </form>
-          <p class="small" id="form-msg"></p>
         </section>
 
-        <!-- TIMELINE -->
-        <section class="card" style="margin-top:16px">
-          <h2 class="section-title">Life & Milestones</h2>
-          <div id="timeline"></div>
+        <section id="music" class="section">
+            <div class="container">
+                <h2 class="section-title">The Music That Unites Us</h2>
+                <p class="section-intro">From his debut album 'Anamika' to the nationwide sensation 'Ya Ali', Zubeen's discography is a journey. Here, we celebrate the songs that connect us all, especially the anthem that became his final wish.</p>
+                
+                <h3>Mayabini: An Anthem of Remembrance</h3>
+                <div class="video-container">
+                    <iframe src="[https://www.youtube.com/embed/bHuHe59vklY](https://www.youtube.com/embed/bHuHe59vklY)" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+
+                <h3>A Living Discography</h3>
+                <p class="section-intro">Each song holds a thousand stories. Explore some of his iconic works below and <a href="#contribute">share your own memory or interpretation</a> to help build a collaborative, living history of his music.</p>
+                <div class="grid">
+                    <div class="card">
+                        <img src="[https://via.placeholder.com/300x300.png/cccccc/333333?text=Anamika+(1992](https://via.placeholder.com/300x300.png/cccccc/333333?text=Anamika+(1992))" alt="Anamika Album Art" class="album-art">
+                        <h3>Anamika (1992)</h3>
+                        <p>The debut album that started it all, becoming a cultural anthem for the youth of Assam.</p>
+                    </div>
+                    <div class="card">
+                        <img src="[https://via.placeholder.com/300x300.png/cccccc/333333?text=Maya+(1994](https://via.placeholder.com/300x300.png/cccccc/333333?text=Maya+(1994))" alt="Maya Album Art" class="album-art">
+                        <h3>Maya (1994)</h3>
+                        <p>An exploration of love and longing that solidified his place as a romantic balladeer.</p>
+                    </div>
+                    <div class="card">
+                        <img src="[https://via.placeholder.com/300x300.png/cccccc/333333?text=Gangster+(2006](https://via.placeholder.com/300x300.png/cccccc/333333?text=Gangster+(2006))" alt="Gangster Album Art" class="album-art">
+                        <h3>Gangster (2006)</h3>
+                        <p>Featuring 'Ya Ali', the song that brought his voice to the national stage and won him a Filmfare Award.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- MULTIMEDIA -->
-        <section class="card" style="margin-top:16px">
-          <h2 class="section-title">🎶 Featured Song</h2>
-          <iframe width="100%" height="250" src="https://www.youtube.com/embed/jnYx6X5z4u8"
-            title="Mayabini by Zubeen Garg" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>
+        <section id="map" class="section">
+            <div class="container">
+                <h2 class="section-title">The "Mayabini" Echo Map</h2>
+                <p class="section-intro">Zubeen's music touched lives across the globe. This interactive map is a visual tapestry of those connections. Each pin represents a fan's memory, pinned to a location that is special to them. See where his voice resonates and <a href="#contribute">add your own memory to the map</a>.</p>
+                <div class="map-container">
+                    <iframe src="[https://www.google.com/maps/d/embed?mid=1ABCDEfgHIjklmNOPqrsTUVwxyZ12345](https://www.google.com/maps/d/embed?mid=1ABCDEfgHIjklmNOPqrsTUVwxyZ12345)" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
         </section>
 
-        <!-- FAN HUB -->
-        <section class="card" style="margin-top:16px">
-          <h2 class="section-title">🌐 Fan Contributions Hub</h2>
-          <div id="hub-grid"></div>
+        <section id="gallery" class="section">
+            <div class="container">
+                <h2 class="section-title">Voice of Assam: Fan Gallery</h2>
+                <p class="section-intro">This gallery is a curated showcase of fan artistry—paintings, poetry, song covers, and digital tributes. To have your work featured, post it on Instagram or Twitter with the hashtag <strong>#JoyZubeenDa</strong>. Our team will review submissions to feature here.</p>
+                <div class="gallery-container">
+                    <div style="text-align:center; padding: 20px;">
+                        Your embedded fan art gallery will appear here.
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <footer>
-          Built with ❤️ to celebrate Zubeen-da’s life. No commerce. A global tribute by fans.
-        </footer>
-      </main>
+        <section id="contribute" class="section">
+            <div class="container">
+                <h2 class="section-title">Share Your Story</h2>
+                <p class="section-intro">This is a space for everyone. Whether it's a personal anecdote, a story about a song, a memory for the map, or a piece of art, your contribution helps keep his legacy alive. Fill out the form below to share.</p>
+                
+                <div class="form-container">
+                    <form action="[https://formbold.com/s/YOUR_UNIQUE_ID](https://formbold.com/s/YOUR_UNIQUE_ID)" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profession">Your Profession (Optional)</label>
+                            <input type="text" id="profession" name="profession">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile">Your Mobile Number (Optional)</label>
+                            <input type="tel" id="mobile" name="mobile">
+                        </div>
+                        <div class="form-group">
+                            <label for="contribution_type">Type of Contribution</label>
+                            <select id="contribution_type" name="contribution_type" required>
+                                <option value="general_tribute">A General Tribute or Memory</option>
+                                <option value="map_memory">A Memory for the Global Map (Please include location in your story)</option>
+                                <option value="song_story">A Story/Interpretation of a Song</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="story">Your Story / Memory / Interpretation</label>
+                            <textarea id="story" name="story" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="upload">Upload a Photo or Artwork (Optional, max 5MB)</label>
+                            <input type="file" id="upload" name="upload" accept="image/*">
+                        </div>
 
-      <!-- RIGHT COLUMN -->
-      <aside class="right-col">
-        <div class="card">
-          <h3 class="section-title">🌍 Legacy Map</h3>
-          <div id="map" style="height:300px;border-radius:8px"></div>
+                        <div class="privacy-notice">
+                            <strong>Data Privacy Notice:</strong> By submitting this form, you are providing your personal data (Name, Email, etc.) to the administrators of this tribute project (joyzubeenda@gmail.com). Your name and story may be publicly displayed on this website, on the global map, or in the discography section. Your contact information will be stored securely and used only to contact you regarding your submission if necessary. It will not be shared with third parties. You have the right to request the removal of your data at any time.
+                        </div>
+                        <div class="consent-group">
+                            <input type="checkbox" id="consent" name="consent" value="agreed" required>
+                            <label for="consent">I have read the privacy notice and I give my consent for my name and submission to be used for the purposes described.</label>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit">Submit My Tribute</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 A Living Tribute to Zubeen Garg. A non-commercial project by the fans, for the fans.</p>
+            <p><a href="#">Privacy Policy</a></p>
         </div>
+    </footer>
 
-        <div class="card" style="margin-top:16px">
-          <h3 class="section-title">🕯️ Virtual Candles</h3>
-          <div class="virtual-candles" id="candle-area"></div>
-        </div>
-
-        <div class="card" style="margin-top:16px">
-          <h3 class="section-title">📢 Share</h3>
-          <button class="pill" id="share-twitter">Tweet</button>
-          <button class="pill" id="share-fb">Facebook</button>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-  <script>
-    // ---------- Simple JS placeholders ----------
-
-    // Fan Spotlight / Timeline demo
-    const timeline = [
-      {year:"1972", text:"Born in Tura"},
-      {year:"1992", text:"First Assamese album released"},
-      {year:"2006", text:"‘Ya Ali’ becomes a nationwide hit"},
-      {year:"2010", text:"Established as multi-language artist"},
-      {year:"2025", text:"Legacy lives on through millions"}
-    ];
-    document.getElementById("timeline").innerHTML =
-      timeline.map(e=>`<p><strong>${e.year}</strong> — ${e.text}</p>`).join("");
-
-    // Virtual candles
-    const candles = JSON.parse(localStorage.getItem("candles")||"[]");
-    function renderCandles(){
-      document.getElementById("candle-area").innerHTML =
-        candles.map(c=>`<div class="candle" title="${c.name}"></div>`).join("") ||
-        "<p class='small'>No candles yet. Be the first.</p>";
-    }
-    document.getElementById("light-candle").onclick = ()=>{
-      const name = prompt("Your name (optional)")||"Anonymous";
-      candles.push({name, ts:Date.now()});
-      localStorage.setItem("candles",JSON.stringify(candles));
-      renderCandles();
-    };
-    renderCandles();
-
-    // Form submission (placeholder for Google Sheets backend)
-    document.getElementById("fan-form").onsubmit = (e)=>{
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target).entries());
-      console.log("Submission:", data);
-      document.getElementById("form-msg").textContent = "✅ Tribute saved (locally). Will connect to Google Sheets soon.";
-      e.target.reset();
-    };
-
-    // Map
-    const map = L.map('map').setView([26.1, 91.7], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-
-    // Share
-    document.getElementById("share-twitter").onclick=()=>window.open("https://twitter.com/intent/tweet?text=Join%20the%20tribute%20to%20Zubeen%20Garg%20at%20joyzubeenda.com%20%23JoyZubeen","_blank");
-    document.getElementById("share-fb").onclick=()=>window.open("https://www.facebook.com/sharer/sharer.php?u=https://joyzubeenda.com","_blank");
-  </script>
 </body>
 </html>
