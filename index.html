@@ -170,6 +170,7 @@ const firebaseConfig = {
   appId: "1:1042239604011:web:dc5a21816c38d67ce3b16e",
   measurementId: "G-WTGYWBD88D"
 };
+
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -202,12 +203,9 @@ db.collection("memories").orderBy("ts", "desc").onSnapshot((snapshot) => {
     ALL_MEMORIES = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     renderAll();
 });
-
-// MAP FIX: Initialize map globally ONE time
 const map = L.map('map', { attributionControl:false }).setView([26.2006, 92.9376], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 let markersLayer = L.layerGroup().addTo(map);
-
 
 // ---------- 5. FORM SUBMISSION LOGIC ----------
 document.getElementById('candleSubmit').onclick = async () => {
@@ -274,7 +272,6 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
         });
 });
 
-
 // ---------- 6. RENDERING & UTILITY FUNCTIONS ----------
 const candleCtx = document.getElementById('candleChart').getContext('2d');
 let candleChart = new Chart(candleCtx, { type:'bar', data: { labels:[], datasets:[{label:'Candles',data:[], backgroundColor:['#f59e0b','#60a5fa','#93c5fd','#34d399','#a3a3a3']}] }, options:{responsive:true, maintainAspectRatio: false, plugins:{legend:{display:false}}, indexAxis: 'y'} });
@@ -311,27 +308,6 @@ function populateDropdowns(){
   document.getElementById('candleState').addEventListener('change', ()=> { document.getElementById('candleDistrict').style.display = (document.getElementById('candleState').value === 'Assam') ? 'block' : 'none'; if (document.getElementById('candleState').value !== 'Assam') { document.getElementById('candleDistrict').value = ''; } });
   document.getElementById('memCountry').addEventListener('change', () => { const isIndia = document.getElementById('memCountry').value === 'India'; document.getElementById('memState').disabled = !isIndia; if (!isIndia) { document.getElementById('memState').value = ''; } });
 }
-
-// ---------- 7. INITIALIZATION ----------
-function init(){
-    const candleModal = document.getElementById('candleModal');
-    const memoryModal = document.getElementById('memoryModal');
-    const contactModal = document.getElementById('contactModal');
-    populateDropdowns();
-    document.getElementById('openCandleModal').onclick = () => { candleModal.style.display = 'flex'; };
-    document.getElementById('candleCancel').onclick = ()=> candleModal.style.display='none';
-    document.getElementById('openMemoryForm').onclick = ()=> { memoryModal.style.display='flex'; document.getElementById('memoryForm').reset(); document.getElementById('memCountry').value = 'India'; document.getElementById('memState').disabled = false; };
-    document.getElementById('memoryCancel').onclick = ()=> memoryModal.style.display='none';
-    document.getElementById('openContactModalBtn').onclick = () => { contactModal.style.display = 'flex'; };
-    document.getElementById('contactCancel').onclick = () => { contactModal.style.display = 'none'; };
-    const modeToggle = document.getElementById('modeToggle');
-    const modeLabel = document.getElementById('modeLabel');
-    function setMode(d){ document.documentElement.classList.toggle('dark', d); document.body.classList.toggle('dark', d); modeLabel.textContent = d ? 'Dark Mode' : 'Light Mode'; }
-    modeToggle.onclick = ()=> setMode(!document.documentElement.classList.contains('dark'));
-    setMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    window.addEventListener('keydown', (e)=> { if(e.key === 'Escape'){ candleModal.style.display='none'; memoryModal.style.display='none'; contactModal.style.display='none'; }});
-    console.log('Joy Zubeen tribute site loaded and connected to Firebase.');
-}
 function renderAll() {
     const candleCountEl = document.getElementById('candleCount');
     const statCandles = document.getElementById('statCandles');
@@ -356,7 +332,30 @@ function renderAll() {
     renderMapPins();
     renderStatsAndCharts();
 }
+
+// ---------- 7. INITIALIZATION ----------
+function init(){
+    populateDropdowns();
+    renderAll(); // Initial render with empty data
+    const candleModal = document.getElementById('candleModal');
+    const memoryModal = document.getElementById('memoryModal');
+    const contactModal = document.getElementById('contactModal');
+    document.getElementById('openCandleModal').onclick = () => { candleModal.style.display = 'flex'; };
+    document.getElementById('candleCancel').onclick = ()=> candleModal.style.display='none';
+    document.getElementById('openMemoryForm').onclick = ()=> { memoryModal.style.display='flex'; document.getElementById('memoryForm').reset(); document.getElementById('memCountry').value = 'India'; document.getElementById('memState').disabled = false; };
+    document.getElementById('memoryCancel').onclick = ()=> memoryModal.style.display='none';
+    document.getElementById('openContactModalBtn').onclick = () => { contactModal.style.display = 'flex'; };
+    document.getElementById('contactCancel').onclick = () => { contactModal.style.display = 'none'; };
+    const modeToggle = document.getElementById('modeToggle');
+    const modeLabel = document.getElementById('modeLabel');
+    function setMode(d){ document.documentElement.classList.toggle('dark', d); document.body.classList.toggle('dark', d); modeLabel.textContent = d ? 'Dark Mode' : 'Light Mode'; }
+    modeToggle.onclick = ()=> setMode(!document.documentElement.classList.contains('dark'));
+    setMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    window.addEventListener('keydown', (e)=> { if(e.key === 'Escape'){ candleModal.style.display='none'; memoryModal.style.display='none'; contactModal.style.display='none'; }});
+    console.log('Joy Zubeen tribute site loaded.');
+}
 init();
+
 </script>
 </body>
 </html>
