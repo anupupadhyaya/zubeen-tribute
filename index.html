@@ -1,609 +1,492 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Joy Zubeen Da - A Tribute to Zubeen Garg</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Zubeen Da - A Tribute to Zubeen Garg</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Leaflet.js for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <style>
-    /* ---------- Dark Mode Theme (Blended Style) ---------- */
-    :root{
-      --accent:#ff4f5a;
-      --accent-2:#ff7b54;
-      --bg:#0b0b10;
-      --card:#111118;
-      --muted:#a8a8b3;
-      --glass: rgba(255,255,255,0.03);
-      --max-width:1100px;
-      --font-sans: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    }
-    html,body{height:100%;}
-    body{
-      margin:0;
-      background: linear-gradient(180deg,#071023 0%, #0b0b10 60%);
-      color:#e7e7ea;
-      font-family:var(--font-sans);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      line-height:1.45;
-      padding:20px;
-      display:flex;
-      justify-content:center;
-      box-sizing:border-box;
-    }
-    .wrap{max-width:var(--max-width);width:100%;}
-    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{
-      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));font-weight:700;font-size:20px;
-      box-shadow:0 6px 18px rgba(255,75,90,0.12);
-    }
-    h1{margin:0;font-size:22px}
-    p.lead{margin:6px 0 0;color:var(--muted)}
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    /* ---------- grid ---------- */
-    .grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
-    @media (max-width:980px){ .grid{grid-template-columns:1fr} .right-col{order:2} }
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+        }
+        .hero-bg {
+            background-color: #111;
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .card {
+            background-color: rgba(23, 23, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: #171717;
+            color: #e5e5e5;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+        }
+        .leaflet-container {
+            background: #1c1c1c;
+        }
+        .btn-primary { background: linear-gradient(to right, #ef4444, #f97316); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
+        .stat-bar { background-color: rgba(239, 68, 68, 0.6); }
 
-    /* ---------- card ---------- */
-    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,0.45)}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* ---------- hero media ---------- */
-    .hero-media{display:flex;gap:12px;align-items:center}
-    .hero-media .cover{width:160px;height:160px;border-radius:8px;background:url('https://via.placeholder.com/320x320?text=Zubeen')center/cover}
-    .meta{flex:1}
-    .meta .cta{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-    .btn{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:white;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.1)}
-
-    /* ---------- timeline ---------- */
-    .timeline{display:flex;flex-direction:column;gap:10px}
-    .timeline .item{padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
-    .timeline .year{font-weight:700;color:var(--accent)}
-
-    /* ---------- fan hub ---------- */
-    .hub-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    @media (max-width:640px){ .hub-grid{grid-template-columns:1fr} }
-    .tribute-card{background:var(--glass);padding:10px;border-radius:8px;min-height:80px;display:flex;flex-direction:column;gap:8px}
-    .tribute-card iframe{max-width:100%;border-radius:6px; border: none;}
-
-    /* ---------- map ---------- */
-    #map{height:330px;border-radius:10px;overflow:hidden}
-    .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--card); color: #fff; box-shadow: 0 3px 14px rgba(0,0,0,0.4); }
-
-    /* ---------- form ---------- */
-    form .row{display:flex;gap:8px}
-    form input, form textarea, form select{
-      width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:inherit; font-family: var(--font-sans);
-    }
-
-    /* ---------- footer ---------- */
-    footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
-
-    /* ---------- small helpers ---------- */
-    .muted{color:var(--muted)}
-    .row{display:flex;gap:8px;align-items:center}
-    .pill{background:rgba(255,255,255,0.05);padding:6px 8px;border-radius:999px;font-size:13px; border: 1px solid transparent; cursor: pointer;}
-    .pill:hover { border-color: rgba(255,255,255,0.2); }
-    .share{display:flex;gap:8px}
-    .lang-toggle{display:flex;gap:8px}
-    a{color:var(--accent)}
-    .export-btn{background:transparent;border:1px dashed rgba(255,255,255,0.2);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
-    .virtual-candles{display:flex;gap:6px;flex-wrap:wrap}
-    .candle{width:14px;height:36px;border-radius:6px;background:linear-gradient(180deg,#ffdd88,#ffb347);position:relative;box-shadow:0 6px 18px rgba(255,120,40,0.12)}
-    .candle:after{content:'';position:absolute;left:50%;transform:translateX(-50%);top:-8px;width:4px;height:8px;border-radius:6px;background:#ffd;box-shadow:0 6px 18px rgba(255,200,60,0.25)}
-  </style>
+        /* Memory Carousel Animation */
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(10px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+        .carousel-item {
+            display: none;
+            animation: fadeInOut 10s infinite;
+        }
+        .carousel-item.active { display: block; }
+    </style>
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo">JZ</div>
-        <div>
-          <h1>Joy Zubeen Da</h1>
-          <p class="lead">A living, fan-curated memorial — memories, map, and creative tributes.</p>
+<body class="antialiased">
+
+    <!-- App Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-12">
+
+        <!-- Hero Section -->
+        <section class="hero-bg text-center py-16 md:py-24 rounded-2xl border border-zinc-800">
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-500">
+                Remembering Zubeen Garg
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto">
+                The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts
+            </p>
+        </section>
+
+        <!-- Candle Lighting Section -->
+        <section id="candle-section" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div class="card p-8 rounded-2xl text-center">
+                <h2 class="text-3xl font-bold text-white mb-2">Light a Virtual Candle</h2>
+                <p class="text-zinc-400 mb-6">Join thousands of fans in lighting a candle to honor Zubeen's eternal legacy.</p>
+                <div class="cursor-pointer group" id="light-candle-btn">
+                    <div class="text-8xl mb-4 group-hover:scale-110 transition-transform duration-300">🕯️</div>
+                    <p class="text-4xl font-bold text-amber-400" id="candle-total-count">0</p>
+                    <p class="text-zinc-300">Candles Lit</p>
+                </div>
+            </div>
+            <div id="candle-stats-container" class="card p-8 rounded-2xl">
+                 <h3 class="text-2xl font-bold text-white mb-6">Global Candlelight Stats</h3>
+                 <div id="candle-stats" class="space-y-5">
+                    <!-- Stats will be dynamically inserted here -->
+                 </div>
+            </div>
+        </section>
+        
+        <!-- Interactive Memory Wall Section -->
+        <section id="memory-wall" class="card p-8 rounded-2xl">
+            <div class="text-center mb-8">
+                 <h2 class="text-3xl font-bold text-white">Interactive Memory Wall</h2>
+                 <p class="text-zinc-400 mt-2">Personal stories from fans, rotating every 10 seconds.</p>
+                 <p class="mt-2 text-sm font-bold text-amber-400"><span id="memory-count">0</span> memories shared</p>
+            </div>
+            <div id="memory-carousel" class="min-h-[150px] relative">
+                <!-- Featured Memory Carousel will be here -->
+            </div>
+            <div class="text-center mt-8">
+                <button id="add-memory-btn" class="btn-primary font-semibold py-3 px-6 rounded-lg">Share Your Memory</button>
+            </div>
+        </section>
+
+        <!-- Tributes & Map Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Fan Tributes Hub -->
+            <div id="tribute-hub" class="lg:col-span-1 card p-8 rounded-2xl">
+                <h2 class="text-3xl font-bold text-white">Fan Tributes Hub</h2>
+                <p class="text-zinc-400 mt-2">Song covers, fan art, and poems from the community.</p>
+                <p class="mt-2 text-sm font-bold text-amber-400"><span id="tribute-count">0</span> tributes featured</p>
+                <div class="text-center mt-6">
+                     <button id="add-tribute-btn" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-3 px-6 rounded-lg">Submit Your Tribute</button>
+                </div>
+                <div id="tributes-grid" class="mt-6 space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                    <!-- Tributes will be inserted here -->
+                </div>
+            </div>
+            <!-- Global Legacy Map -->
+            <div id="map-section" class="lg:col-span-2 card p-6 rounded-2xl">
+                 <h2 class="text-3xl font-bold text-white text-center">Global Legacy Map</h2>
+                 <p class="text-zinc-400 mt-2 text-center">Visualizing the candles, memories, and tributes from around the world.</p>
+                 <p class="text-center mt-2 text-sm font-bold text-amber-400"><span id="country-count">0</span> countries represented</p>
+                <div id="map" class="h-96 w-full rounded-lg mt-4 z-0"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-container" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);">
+        <!-- Candle Modal -->
+        <div id="candle-modal" class="card p-8 rounded-2xl w-full max-w-md hidden">
+             <h2 class="text-2xl font-bold text-white mb-4">Light Your Candle</h2>
+             <form id="candle-form" class="space-y-4">
+                 <div>
+                    <label for="candle-name" class="block text-sm font-medium text-zinc-300">Your Name</label>
+                    <input type="text" id="candle-name" class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white focus:ring-red-500 focus:border-red-500" required>
+                 </div>
+                 <div>
+                    <label for="candle-city" class="block text-sm font-medium text-zinc-300">City (India)</label>
+                    <select id="candle-city" class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white focus:ring-red-500 focus:border-red-500">
+                        <option value="">Select a city</option>
+                    </select>
+                 </div>
+                 <div>
+                    <label for="candle-state" class="block text-sm font-medium text-zinc-300">State</label>
+                    <input type="text" id="candle-state" class="mt-1 w-full bg-zinc-700 border-zinc-600 rounded-lg px-3 py-2 text-white" readonly>
+                 </div>
+                 <p class="text-xs text-zinc-400 text-center">For international locations, please add a memory or tribute pin on the map.</p>
+                 <div class="flex gap-4 pt-4">
+                    <button type="submit" class="w-full btn-primary font-semibold py-2 px-4 rounded-lg">Submit</button>
+                    <button type="button" id="cancel-candle" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-2 px-4 rounded-lg">Cancel</button>
+                 </div>
+             </form>
         </div>
-      </div>
-
-      <div style="margin-left:auto" class="lang-toggle">
-        <button class="pill" id="lang-en">EN</button>
-        <button class="pill" id="lang-as">অসমীয়া</button>
-        <button class="pill" id="lang-hi">हिन्दी</button>
-      </div>
-    </header>
-
-    <div class="grid">
-      <main>
-        <section class="card hero">
-          <div class="hero-media">
-            <div class="cover" id="hero-cover"></div>
-            <div class="meta">
-              <div style="display:flex;justify-content:space-between;align-items:center">
+        <!-- Memory/Tribute Modal -->
+        <div id="submission-modal" class="card p-8 rounded-2xl w-full max-w-lg hidden">
+            <h2 id="submission-title" class="text-2xl font-bold text-white mb-4"></h2>
+            <form id="submission-form" class="space-y-4">
+                <input type="hidden" id="submission-type" name="type">
                 <div>
-                  <h2 id="hero-title">Zubeen Garg — The Voice</h2>
-                  <div class="small muted" id="hero-sub">Singer • Composer • Actor • Activist</div>
+                    <label for="submission-name" class="block text-sm font-medium text-zinc-300">Your Name</label>
+                    <input type="text" id="submission-name" name="name" class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white" required>
                 </div>
-                <div class="row">
-                  <button class="btn" id="light-candle">Light a Candle</button>
-                  <button class="btn ghost" id="export-all" title="Export all submissions from this site as a single file">Export All</button>
+                 <div>
+                    <label for="submission-profession" class="block text-sm font-medium text-zinc-300">Profession/Institute</label>
+                    <input type="text" id="submission-profession" name="profession" class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white">
                 </div>
-              </div>
-
-              <p class="small muted" style="margin-top:10px" id="hero-blurb">
-                This site is a fan-built, living archive. Add your memory, pin your city to the legacy map, and help build a global mosaic of love.
-              </p>
-
-              <div class="cta small">
-                <button class="pill" id="add-memory-btn">+ Add Memory</button>
-                <button class="pill" id="go-to-map">View Legacy Map</button>
-                <button class="pill" id="go-to-hub">Fan Contributions</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="card" style="margin-top:16px">
-          <h3 id="timeline-title">Life & Milestones</h3>
-          <div class="timeline" id="timeline">
-            </div>
-        </section>
-
-        <section class="card" style="margin-top:16px">
-          <h3 id="hub-title">Fan Contributions Hub</h3>
-          <p class="small muted" id="hub-desc">Covers, poems, art and memories shared by fans. You can export your submissions or import contributions from others.</p>
-
-          <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-            <button class="btn" id="open-contribute">Contribute Now</button>
-            <button class="export-btn" id="download-json">Export My Submissions</button>
-            <input id="import-file" type="file" style="display:none" accept=".json">
-            <button class="export-btn" id="import-json-btn">Import Submissions</button>
-          </div>
-
-          <div style="margin-top:12px" id="fan-list">
-            <div class="hub-grid" id="hub-grid">
-              </div>
-          </div>
-        </section>
-
-        <footer>
-          <div class="small muted">Designed with ❤️ to celebrate Zubeen's life. No transactions. No commerce. Built as a living community archive.</div>
-        </footer>
-      </main>
-
-      <aside class="right-col">
-        <div class="card">
-          <h4 id="map-title">Legacy Map</h4>
-          <p class="small muted" id="map-desc">Pin the place connected to your memory. Export/import pins to help admins collect entries.</p>
-          <div id="map"></div>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-            <button class="btn" id="add-pin-btn">Add Pin</button>
-            <button class="export-btn" id="export-pins">Export Pins</button>
-            <input id="import-pins-file" type="file" style="display:none" accept=".json">
-            <button class="export-btn" id="import-pins-btn">Import Pins</button>
-          </div>
+                 <div>
+                    <label for="submission-city" class="block text-sm font-medium text-zinc-300">City, Country</label>
+                    <input type="text" id="submission-city" name="city" placeholder="e.g., Guwahati, India" class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white" required>
+                </div>
+                <div>
+                    <label id="submission-text-label" for="submission-text" class="block text-sm font-medium text-zinc-300"></label>
+                    <textarea id="submission-text" name="text" rows="4" class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white" required></textarea>
+                </div>
+                <div id="link-field-container">
+                    <label for="submission-link" class="block text-sm font-medium text-zinc-300">YouTube Link</label>
+                    <input type="url" id="submission-link" name="link" placeholder="https://youtube.com/..." class="mt-1 w-full bg-zinc-800 border-zinc-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="w-full btn-primary font-semibold py-2 px-4 rounded-lg">Submit</button>
+                    <button type="button" id="cancel-submission" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-2 px-4 rounded-lg">Cancel</button>
+                </div>
+            </form>
         </div>
-
-        <div class="card" style="margin-top:16px">
-          <h4 id="candles-title">Virtual Candles</h4>
-          <p class="small muted" id="candles-desc">Light a candle to remember. Each visitor can light one (stored locally).</p>
-          <div class="virtual-candles" id="candle-area">
-            </div>
-        </div>
-
-        <div class="card" style="margin-top:16px">
-          <h4 id="share-title">Share & Spread</h4>
-          <div class="share">
-            <button class="pill" id="share-twitter"><i class="fa-brands fa-x-twitter"></i> Tweet</button>
-            <button class="pill" id="share-fb">Facebook</button>
-            <button class="pill" id="copy-link">Copy Link</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:16px">
-            <h4 id="causes-title">Legacy & Causes</h4>
-            <p class="small muted" id="causes-desc">Honor Zubeen's legacy by supporting causes he cared about.</p>
-            <div class="timeline" style="margin-top: 10px;">
-                <div class="item"><strong class="year" style="color: #60a5fa;">Animal Rights</strong><div class="small muted">Support local shelters, following his 2018 PETA Hero award.</div></div>
-                <div class="item"><strong class="year" style="color: #a78bfa;">Cultural Preservation</strong><div class="small muted">Promote and share Assamese language, music, and arts.</div></div>
-                <div class="item"><strong class="year" style="color: #f472b6;">Community Unity</strong><div class="small muted">Bridge divides through music and shared experiences.</div></div>
-            </div>
-        </div>
-      </aside>
     </div>
-  </div>
 
-  <div id="modal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;z-index:9999; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);">
-    <div style="width:100%;max-width:760px;background:linear-gradient(180deg,#0e0e12,#0b0b0f);padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0" id="modal-title">Share Your Tribute</h3>
-        <button id="close-modal" class="pill">Close</button>
-      </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-      <form id="contribute-form" style="margin-top:12px">
-        <div class="row">
-          <input type="text" id="contrib-name" name="name" placeholder="Your name (or anonymous)" required>
-          <select id="contrib-type" name="type">
-            <option value="Memory / Story">Memory / Story</option>
-            <option value="Cover / Performance">Cover / Performance (link)</option>
-            <option value="Fan Art">Fan Art (link)</option>
-            <option value="Poem / Lyric">Poem / Lyric</option>
-          </select>
-        </div>
+        // --- DATA & CONFIG ---
+        const BASE_COUNTS = { candles: 12847, memories: 2847, tributes: 156 };
+        const STORAGE_KEYS = {
+            CANDLES: 'zubeen_tribute_candles_v2',
+            MEMORIES: 'zubeen_tribute_memories_v2',
+            TRIBUTES: 'zubeen_tribute_tributes_v2',
+            CANDLE_LIT: 'zubeen_tribute_candle_lit_v2'
+        };
+        const INDIAN_CITIES = [
+            { city: "Guwahati", state: "Assam" }, { city: "Jorhat", state: "Assam" }, { city: "Dibrugarh", state: "Assam" }, { city: "Silchar", state: "Assam" }, { city: "Tezpur", state: "Assam" },
+            { city: "Mumbai", state: "Maharashtra" }, { city: "Delhi", state: "Delhi" }, { city: "Bengaluru", state: "Karnataka" },
+            { city: "Kolkata", state: "West Bengal" }, { city: "Chennai", state: "Tamil Nadu" }, { city: "Hyderabad", state: "Telangana" },
+            { city: "Pune", state: "Maharashtra" }, { city: "Ahmedabad", state: "Gujarat" }, { city: "Jaipur", state: "Rajasthan" },
+            { city: "Shillong", state: "Meghalaya" }, { city: "Itanagar", state: "Arunachal Pradesh" },
+        ].sort((a, b) => a.city.localeCompare(b.city));
 
-        <div style="margin-top:10px">
-          <textarea id="contrib-text" name="text" rows="4" placeholder="Write your memory, paste your poem, or describe your linked art/cover..." required></textarea>
-        </div>
+        // --- UI ELEMENTS ---
+        const candleBtn = document.getElementById('light-candle-btn');
+        const modalContainer = document.getElementById('modal-container');
+        const candleModal = document.getElementById('candle-modal');
+        const submissionModal = document.getElementById('submission-modal');
+        
+        // --- HELPERS (Moved up to fix initialization error) ---
+        const loadFromStorage = (key, defaultValue) => {
+            try { return JSON.parse(localStorage.getItem(key)) || defaultValue; } 
+            catch (e) { return defaultValue; }
+        };
+        const saveToStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+        const escapeHTML = str => str ? str.replace(/[&<>"']/g, m => ({'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#039;'})[m]) : '';
+        const getYoutubeId = url => {
+            if (!url) return null;
+            const match = url.match(/[?&]v=([^&]+)|youtu\.be\/([^?&]+)/);
+            return match ? match[1] || match[2] : null;
+        };
+        
+        // --- STATE MANAGEMENT ---
+        let candles = loadFromStorage(STORAGE_KEYS.CANDLES, []);
+        let memories = loadFromStorage(STORAGE_KEYS.MEMORIES, [
+             {id: 1, name: "Rohan Das", profession: "Student", city: "Jorhat, India", text: "I first heard 'Ya Ali' in my college hostel. That voice... it became the anthem of our friendship and our dreams. Zubeen da, you are immortal.", timestamp: Date.now() - 20000},
+             {id: 2, name: "Priya Sharma", profession: "Software Engineer", city: "Bengaluru, India", text: "Living far from home, his Bihu songs were my connection to Assam. During the toughest times, his music felt like a warm hug from my motherland.", timestamp: Date.now() - 10000},
+             {id: 3, name: "John Doe", profession: "Musician", city: "London, UK", text: "I discovered his music through a friend. The emotion in his voice transcends language. A true global artist who inspired me to be fearless with my own art.", timestamp: Date.now()}
+        ]);
+        let tributes = loadFromStorage(STORAGE_KEYS.TRIBUTES, []);
+        let candleLitStatus = loadFromStorage(STORAGE_KEYS.CANDLE_LIT, false);
 
-        <div style="margin-top:8px" class="row">
-          <input id="contrib-place" name="place" placeholder="City / location (optional)">
-          <input id="contrib-year" name="year" placeholder="Year (optional)">
-        </div>
+        // --- MODAL HANDLING ---
+        const openModal = (modalElement) => {
+            modalContainer.style.display = 'flex';
+            modalElement.style.display = 'block';
+        };
+        const closeModal = () => {
+            modalContainer.style.display = 'none';
+            candleModal.style.display = 'none';
+            submissionModal.style.display = 'none';
+        };
 
-        <div style="margin-top:8px" class="row">
-          <input id="contrib-embed" name="embed" placeholder="Optional: YouTube, Imgur, or other media link">
-          <button class="btn" type="submit" id="submit-contrib">Submit Tribute</button>
-        </div>
+        // --- CANDLE LOGIC ---
+        function renderCandleStats() {
+            const statsContainer = document.getElementById('candle-stats');
+            const totalCandles = BASE_COUNTS.candles + candles.length;
+            document.getElementById('candle-total-count').textContent = totalCandles.toLocaleString();
 
-        <div id="contrib-msg" style="margin-top:8px;color:var(--muted)"></div>
-      </form>
-    </div>
-  </div>
+            const cityCounts = {};
+            const stateCounts = {};
+            candles.forEach(c => {
+                cityCounts[c.city] = (cityCounts[c.city] || 0) + 1;
+                stateCounts[c.state] = (stateCounts[c.state] || 0) + 1;
+            });
 
-  <script>
-  /**********************************************
-   * Simple static tribute site JS (client-side only)
-   * - Stores submissions & pins in localStorage
-   * - Allows export/import (JSON)
-   * - Interactive map (Leaflet)
-   **********************************************/
+            const topCities = Object.entries(cityCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+            const topStates = Object.entries(stateCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
 
-  /* ------------------------------
-     Utilities & storage keys
-     ------------------------------ */
-  const STORAGE_KEYS = {
-    SUBMISSIONS: 'joyzubeen_submissions_v2',
-    PINS: 'joyzubeen_pins_v2',
-    CANDLES: 'joyzubeen_candles_v2',
-    LANG: 'joyzubeen_lang_v2'
-  };
-
-  const STRINGS = {
-    en: {
-        title: 'Zubeen Garg — The Voice',
-        sub: 'Singer • Composer • Actor • Activist',
-        blurb: 'This site is a fan-built, living archive. Add your memory, pin your city to the legacy map, and help build a global mosaic of love.',
-        timelineTitle: 'Life & Milestones',
-        hubTitle: 'Fan Contributions Hub',
-        hubDesc: 'Covers, poems, art and memories shared by fans. You can export your submissions or import contributions from others.',
-        mapTitle: 'Legacy Map',
-        mapDesc: 'Pin the place connected to your memory. Export/import pins to help admins collect entries.',
-        candlesTitle: 'Virtual Candles',
-        candlesDesc: 'Light a candle to remember. Each visitor can light one (stored locally).',
-        shareTitle: 'Share & Spread',
-        causesTitle: 'Legacy & Causes',
-        causesDesc: 'Honor Zubeen\'s legacy by supporting causes he cared about.',
-        modalTitle: 'Share Your Tribute',
-    },
-    as: {
-        title: 'জুবিন গাৰ্গ — কণ্ঠ',
-        sub: 'গায়ক • সুৰকাৰ • অভিনেতা • কৰ্মী',
-        blurb: 'এই ছাইটটো অনুৰাগীৰ দ্বাৰা নিৰ্মিত এক জীৱন্ত আৰ্কাইভ। আপোনাৰ স্মৃতি যোগ কৰক, আপোনাৰ চহৰখন লিগেচি মেপত পিন কৰক, আৰু প্ৰেমৰ এক বিশ্বব্যাপী মোজেইক নিৰ্মাণত সহায় কৰক।',
-        timelineTitle: 'জীৱন আৰু মাইলৰ খুঁটি',
-        hubTitle: 'অনুৰাগীৰ অৱদান কেন্দ্ৰ',
-        hubDesc: 'অনুৰাগীসকলে শ্বেয়াৰ কৰা কভাৰ, কবিতা, কলা আৰু স্মৃতি। আপুনি আপোনাৰ দাখিলসমূহ ৰপ্তানি কৰিব পাৰে বা আনৰ পৰা অৱদান আমদানি কৰিব পাৰে।',
-        mapTitle: 'লিগেচি মেপ',
-        mapDesc: 'আপোনাৰ স্মৃতিৰ সৈতে জড়িত ঠাইখন পিন কৰক। প্ৰশাসকসকলক প্ৰৱেশ সংগ্ৰহ কৰাত সহায় কৰিবলৈ পিন ৰপ্তানি/আমদানি কৰক।',
-        candlesTitle: 'ভাৰ্চুৱেল মমবাতি',
-        candlesDesc: 'মনত ৰাখিবলৈ এটা মমবাতি জ্বলাওক। প্ৰতিজন দৰ্শকে এটা জ্বলাব পাৰে (স্থানীয়ভাৱে সংৰক্ষিত)।',
-        shareTitle: 'শ্বেয়াৰ আৰু প্ৰচাৰ কৰক',
-        causesTitle: 'উত্তৰাধিকাৰ আৰু কাৰণসমূহ',
-        causesDesc: 'তেওঁ গুৰুত্ব দিয়া কাৰণসমূহক সমৰ্থন কৰি জুবিনৰ উত্তৰাধিকাৰক সন্মান জনাওক।',
-        modalTitle: 'আপোনাৰ শ্ৰদ্ধাঞ্জলি শ্বেয়াৰ কৰক',
-    },
-    hi: {
-        title: 'ज़ुबिन गर्ग — आवाज़',
-        sub: 'गायक • संगीतकार • अभिनेता • कार्यकर्ता',
-        blurb: 'यह साइट प्रशंसकों द्वारा निर्मित एक जीवंत संग्रह है। अपनी स्मृति जोड़ें, अपने शहर को विरासत के नक्शे पर पिन करें, और प्यार का एक वैश्विक मोज़ेक बनाने में मदद करें।',
-        timelineTitle: 'जीवन और मील के पत्थर',
-        hubTitle: 'प्रशंसक योगदान केंद्र',
-        hubDesc: 'प्रशंसकों द्वारा साझा किए गए कवर, कविताएं, कला और यादें। आप अपने सबमिशन निर्यात कर सकते हैं या दूसरों से योगदान आयात कर सकते हैं।',
-        mapTitle: 'विरासत का नक्शा',
-        mapDesc: 'अपनी स्मृति से जुड़े स्थान को पिन करें। प्रशासकों को प्रविष्टियाँ एकत्र करने में मदद करने के लिए पिन निर्यात/आयात करें।',
-        candlesTitle: 'आभासी मोमबत्तियाँ',
-        candlesDesc: 'याद करने के लिए एक मोमबत्ती जलाएं। प्रत्येक आगंतुक एक जला सकता है (स्थानीय रूप से संग्रहीत)।',
-        shareTitle: 'साझा करें और फैलाएं',
-        causesTitle: 'विरासत और कारण',
-        causesDesc: 'जिन कारणों की वह परवाह करते थे, उनका समर्थन करके ज़ुबिन की विरासत का सम्मान करें।',
-        modalTitle: 'अपनी श्रद्धांजलि साझा करें',
-    }
-  };
-
-  const DEFAULT_TIMELINE = [
-    {year: '1972', text: {en: 'Born in Tura, Meghalaya', as: 'মেঘালয়ৰ তুৰাত জন্ম', hi: 'मेघालय के तुरा में जन्म'}},
-    {year: '1992', text: {en: 'Debut album "Anamika" released', as: '"অনামিকা" এলবাম মুক্তি', hi: 'पहला एल्बम "अनामिका" रिलीज़ हुआ'}},
-    {year: '2006', text: {en: '"Ya Ali" becomes a nationwide hit', as: '"য়া আলি" দেশজুৰি হিট', hi: '"या अली" देशव्यापी हिट हुआ'}},
-    {year: '2018', text: {en: 'Honored as PETA Hero to Animals', as: 'PETA হিৰো টু এনিমেলছ সন্মান', hi: 'PETA हीरो टू एनिमल्स से सम्मानित'}},
-    {year: 'Legacy', text: {en: 'Lives on through millions of hearts', as: 'লাখ লাখ হৃদয়ত জীয়াই আছে', hi: 'लाखों दिलों में जीवित हैं'}}
-  ];
-
-  /* ------------------------------
-     Init UI & Language
-     ------------------------------ */
-  function el(id){ return document.getElementById(id); }
-  let LANG = 'en';
-
-  function loadFromStorage(key, def){
-    try{
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : def;
-    }catch(e){ return def; }
-  }
-  function saveToStorage(key, obj){
-    localStorage.setItem(key, JSON.stringify(obj));
-  }
-
-  function setLang(l){
-    LANG = l;
-    saveToStorage(STORAGE_KEYS.LANG, LANG);
-    el('hero-title').textContent = STRINGS[LANG].title;
-    el('hero-sub').textContent = STRINGS[LANG].sub;
-    el('hero-blurb').textContent = STRINGS[LANG].blurb;
-    el('timeline-title').textContent = STRINGS[LANG].timelineTitle;
-    el('hub-title').textContent = STRINGS[LANG].hubTitle;
-    el('hub-desc').textContent = STRINGS[LANG].hubDesc;
-    el('map-title').textContent = STRINGS[LANG].mapTitle;
-    el('map-desc').textContent = STRINGS[LANG].mapDesc;
-    el('candles-title').textContent = STRINGS[LANG].candlesTitle;
-    el('candles-desc').textContent = STRINGS[LANG].candlesDesc;
-    el('share-title').textContent = STRINGS[LANG].shareTitle;
-    el('causes-title').textContent = STRINGS[LANG].causesTitle;
-    el('causes-desc').textContent = STRINGS[LANG].causesDesc;
-    el('modal-title').textContent = STRINGS[LANG].modalTitle;
-    renderTimeline();
-  }
-
-  el('lang-en').addEventListener('click', ()=>setLang('en'));
-  el('lang-as').addEventListener('click', ()=>setLang('as'));
-  el('lang-hi').addEventListener('click', ()=>setLang('hi'));
-  
-  /* ------------------------------
-     Timeline
-     ------------------------------ */
-  function renderTimeline(){
-    const container = el('timeline');
-    container.innerHTML = '';
-    DEFAULT_TIMELINE.forEach(it=>{
-      const d = document.createElement('div');
-      d.className='item';
-      d.innerHTML = `<div class="year">${it.year}</div><div class="small muted">${it.text[LANG]}</div>`;
-      container.appendChild(d);
-    });
-  }
-
-  /* ------------------------------
-     Fan hub: submissions
-     ------------------------------ */
-  let submissions = loadFromStorage(STORAGE_KEYS.SUBMISSIONS, []);
-  function renderSubmissions(){
-    const g = el('hub-grid');
-    g.innerHTML = '';
-    if(!submissions.length){
-      g.innerHTML = `<div class="tribute-card small muted">No tributes yet. Click "Contribute Now" to add the first memory.</div>`;
-      return;
-    }
-    submissions.slice().reverse().forEach(s => {
-      const card = document.createElement('div');
-      card.className='tribute-card';
-      let content = `<strong>${escapeHtml(s.name)}</strong> <span class="small muted">· ${escapeHtml(s.type)} ${s.year?('· '+escapeHtml(s.year)):''}</span>`;
-      
-      if(s.embed){
-        const embedUrl = convertToEmbed(s.embed);
-        if(embedUrl) {
-            content += `<iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe>`;
+            let html = `<div><h4 class="font-semibold text-white mb-2">Top Cities (India)</h4><div class="space-y-2">`;
+            if (topCities.length > 0) {
+                topCities.forEach(([city, count]) => {
+                    html += `<div class="text-sm"><div class="flex justify-between mb-1"><span class="text-zinc-300">${city}</span><span>${count}</span></div><div class="w-full bg-zinc-700 rounded-full h-1.5"><div class="stat-bar h-1.5 rounded-full" style="width: ${Math.max(5, (count / topCities[0][1]) * 100)}%"></div></div></div>`;
+                });
+            } else { html += `<p class="text-sm text-zinc-500">No candles lit yet.</p>`;}
+            html += `</div></div><div><h4 class="font-semibold text-white mb-2 mt-4">Top States (India)</h4><div class="space-y-2">`;
+             if (topStates.length > 0) {
+                topStates.forEach(([state, count]) => {
+                    html += `<div class="text-sm"><div class="flex justify-between mb-1"><span class="text-zinc-300">${state}</span><span>${count}</span></div><div class="w-full bg-zinc-700 rounded-full h-1.5"><div class="stat-bar h-1.5 rounded-full" style="width: ${Math.max(5, (count / topStates[0][1]) * 100)}%"></div></div></div>`;
+                });
+            } else { html += `<p class="text-sm text-zinc-500">No data yet.</p>`; }
+            html += `</div></div>`;
+            statsContainer.innerHTML = html;
         }
-      }
-      
-      content += `<div class="small muted" style="white-space:pre-wrap;">${escapeHtml(s.text)}</div>`;
-      if(s.place) {
-        content += `<div class="small muted" style="margin-top: auto;">${escapeHtml(s.place)}</div>`;
-      }
-      card.innerHTML = content;
-      g.appendChild(card);
-    });
-  }
 
-  /* ------------------------------
-     Contribute modal
-     ------------------------------ */
-  const modal = el('modal');
-  el('add-memory-btn').addEventListener('click', ()=>openModal());
-  el('open-contribute').addEventListener('click', ()=>openModal());
-  el('close-modal').addEventListener('click', ()=>closeModal());
-  function openModal(){ modal.style.display='flex'; }
-  function closeModal(){ modal.style.display='none'; }
-
-  el('contribute-form').addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const entry = Object.fromEntries(formData.entries());
-    entry.id = Date.now();
-    entry.created_at = new Date().toISOString();
-    
-    submissions.push(entry);
-    saveToStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
-    el('contrib-msg').textContent = 'Thank you — your tribute is saved. Export it to share with admins.';
-    renderSubmissions();
-    e.target.reset();
-    setTimeout(()=>{ el('contrib-msg').textContent=''; closeModal(); }, 2000);
-  });
-
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  function convertToEmbed(url){
-    if(!url) return null;
-    let youtubeMatch = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
-    if(youtubeMatch && youtubeMatch[1]) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-    return null; // Can add more embed providers here later
-  }
-
-  /* ------------------------------
-     Export / import submissions
-     ------------------------------ */
-  el('download-json').addEventListener('click', ()=> downloadFile('joyzubeen_submissions.json', JSON.stringify(submissions, null, 2)));
-  
-  el('export-all').addEventListener('click', ()=>{
-    const data = {
-      submissions: loadFromStorage(STORAGE_KEYS.SUBMISSIONS, []), 
-      pins: loadFromStorage(STORAGE_KEYS.PINS, []), 
-      candles: loadFromStorage(STORAGE_KEYS.CANDLES, [])
-    };
-    downloadFile('joyzubeen_export_all.json', JSON.stringify(data, null, 2));
-  });
-
-  function downloadFile(filename, content){
-    const a = document.createElement('a');
-    const blob = new Blob([content], {type:'application/json'});
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }
-
-  el('import-json-btn').addEventListener('click', ()=> el('import-file').click());
-  el('import-file').addEventListener('change', (ev)=>{
-    const f = ev.target.files[0]; if(!f) return;
-    const reader = new FileReader();
-    reader.onload = (e)=>{
-      try{
-        const parsed = JSON.parse(e.target.result);
-        if(Array.isArray(parsed)) {
-            // Simple submissions array
-            submissions = [...new Map(submissions.concat(parsed).map(item => [item.id, item])).values()];
-        } else if(parsed.submissions || parsed.pins) {
-            // Full export file
-            submissions = [...new Map(submissions.concat(parsed.submissions || []).map(item => [item.id, item])).values()];
-            pins = [...new Map(pins.concat(parsed.pins || []).map(item => [item.id, item])).values()];
+        function handleCandleClick() {
+            if (candleLitStatus) {
+                alert("You've already lit a candle in this session. Thank you for your tribute!");
+                return;
+            }
+            openModal(candleModal);
         }
-        saveToStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
-        saveToStorage(STORAGE_KEYS.PINS, pins);
-        renderSubmissions();
-        renderPins();
-        alert('Imported successfully!');
-      } catch(err){ alert('Invalid JSON file.'); }
-    };
-    reader.readAsText(f);
-  });
 
-  /* ------------------------------
-     Map (Leaflet)
-     ------------------------------ */
-  let map, pins = loadFromStorage(STORAGE_KEYS.PINS, []);
-  function initMap(){
-    map = L.map('map', {attributionControl:false}).setView([26.1445,91.7362], 4); // NE India default
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{ maxZoom:19 }).addTo(map);
-    renderPins();
-  }
+        // --- MEMORY WALL & TRIBUTE HUB LOGIC ---
+        let memoryCarouselIndex = 0;
+        function renderMemoryCarousel() {
+            const carouselContainer = document.getElementById('memory-carousel');
+            document.getElementById('memory-count').textContent = (BASE_COUNTS.memories + memories.length).toLocaleString();
+            carouselContainer.innerHTML = '';
+            memories.forEach((mem, index) => {
+                const item = document.createElement('div');
+                item.className = 'carousel-item absolute inset-0 p-4 text-center flex flex-col justify-center';
+                if (index === 0) item.classList.add('active');
+                item.innerHTML = `
+                    <p class="text-lg md:text-xl italic text-white">"${escapeHTML(mem.text)}"</p>
+                    <p class="mt-4 font-semibold text-amber-400">${escapeHTML(mem.name)}</p>
+                    <p class="text-sm text-zinc-400">${escapeHTML(mem.profession || '')} • ${escapeHTML(mem.city)}</p>
+                `;
+                carouselContainer.appendChild(item);
+            });
+        }
+        function startMemoryCarousel() {
+            const items = document.querySelectorAll('.carousel-item');
+            if (items.length <= 1) return;
+            setInterval(() => {
+                items[memoryCarouselIndex].classList.remove('active');
+                memoryCarouselIndex = (memoryCarouselIndex + 1) % items.length;
+                items[memoryCarouselIndex].classList.add('active');
+            }, 10000);
+        }
 
-  function renderPins(){
-    if(map._pinsLayer) map.removeLayer(map._pinsLayer);
-    const layer = L.layerGroup();
-    pins.forEach(p => {
-      const marker = L.marker([p.lat,p.lng]).bindPopup(`<strong>${escapeHtml(p.title)}</strong><div class="small muted">${escapeHtml(p.text)}</div>`);
-      layer.addLayer(marker);
+        function renderTributes() {
+             const grid = document.getElementById('tributes-grid');
+             document.getElementById('tribute-count').textContent = (BASE_COUNTS.tributes + tributes.length).toLocaleString();
+             grid.innerHTML = tributes.length > 0 ? '' : '<p class="text-sm text-zinc-500 text-center">No tributes submitted yet.</p>';
+             [...tributes].reverse().forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'bg-zinc-800 p-3 rounded-lg';
+                let content = `<p class="font-semibold text-white text-sm">${escapeHTML(t.name)}</p><p class="text-xs text-zinc-400 mb-2">${escapeHTML(t.city)}</p>`;
+                const youtubeId = t.link ? getYoutubeId(t.link) : null;
+                if(youtubeId) {
+                    content += `<div class="aspect-w-16 aspect-h-9 my-2"><iframe src="https://www.youtube.com/embed/${youtubeId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="rounded w-full h-full"></iframe></div>`;
+                }
+                content += `<p class="text-sm text-zinc-300 italic">"${escapeHTML(t.text)}"</p>`;
+                div.innerHTML = content;
+                grid.appendChild(div);
+             });
+        }
+
+        // --- MAP LOGIC ---
+        const map = L.map('map').setView([24, 88], 4);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+        const markers = L.layerGroup().addTo(map);
+
+        const candleIcon = L.divIcon({className: 'text-2xl', html: '🕯️'});
+        const memoryIcon = L.divIcon({className: 'text-2xl', html: '❤️'});
+        const tributeIcon = L.divIcon({className: 'text-2xl', html: '🎵'});
+
+        async function geocodeAndAddMarker(item, type) {
+            let lat, lon;
+            const cityData = INDIAN_CITIES.find(c => c.city === item.city && c.state === item.state);
+            // Basic fallback for non-Indian cities for demo purposes
+            if (cityData) {
+                 const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(item.city + ',' + item.state)}&format=json&limit=1`);
+                 const data = await response.json();
+                 if (data.length > 0) { [lat, lon] = [data[0].lat, data[0].lon]; }
+            } else {
+                 const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(item.city)}&format=json&limit=1`);
+                 const data = await response.json();
+                 if (data.length > 0) { [lat, lon] = [data[0].lat, data[0].lon]; }
+            }
+
+            if (!lat || !lon) return;
+            
+            let icon, popupText;
+            switch(type) {
+                case 'candle':
+                    icon = candleIcon;
+                    popupText = `<b>🕯️ Candle by ${escapeHTML(item.name)}</b><br>${escapeHTML(item.city)}, ${escapeHTML(item.state)}`;
+                    break;
+                case 'memory':
+                    icon = memoryIcon;
+                    popupText = `<b>❤️ Memory by ${escapeHTML(item.name)}</b><br>${escapeHTML(item.city)}<br><i>"${escapeHTML(item.text).substring(0,50)}..."</i>`;
+                    break;
+                case 'tribute':
+                    icon = tributeIcon;
+                    popupText = `<b>🎵 Tribute by ${escapeHTML(item.name)}</b><br>${escapeHTML(item.city)}<br><i>"${escapeHTML(item.text).substring(0,50)}..."</i>`;
+                    break;
+            }
+             L.marker([lat, lon], { icon }).addTo(markers).bindPopup(popupText);
+        }
+
+        function renderAllMarkers() {
+            markers.clearLayers();
+            const allCountries = new Set();
+            candles.forEach(c => {
+                geocodeAndAddMarker({ ...c }, 'candle');
+                allCountries.add('India');
+            });
+            memories.forEach(m => {
+                 geocodeAndAddMarker(m, 'memory');
+                 allCountries.add(m.city.split(',').pop().trim());
+            });
+            tributes.forEach(t => {
+                geocodeAndAddMarker(t, 'tribute');
+                allCountries.add(t.city.split(',').pop().trim());
+            });
+            document.getElementById('country-count').textContent = allCountries.size;
+        }
+
+        // --- INITIALIZATION & EVENT LISTENERS ---
+        
+        const citySelect = document.getElementById('candle-city');
+        INDIAN_CITIES.forEach(c => {
+            const option = document.createElement('option');
+            option.value = c.city;
+            option.textContent = c.city;
+            citySelect.appendChild(option);
+        });
+        citySelect.addEventListener('change', (e) => {
+            const selectedCity = INDIAN_CITIES.find(c => c.city === e.target.value);
+            document.getElementById('candle-state').value = selectedCity ? selectedCity.state : '';
+        });
+
+        document.getElementById('candle-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('candle-name').value;
+            const city = document.getElementById('candle-city').value;
+            const state = document.getElementById('candle-state').value;
+            if (!city || !state) { alert("Please select a valid city."); return; }
+            
+            candles.push({ id: Date.now(), name, city, state, country: "India" });
+            saveToStorage(STORAGE_KEYS.CANDLES, candles);
+            candleLitStatus = true;
+            saveToStorage(STORAGE_KEYS.CANDLE_LIT, true);
+
+            renderCandleStats();
+            renderAllMarkers();
+            closeModal();
+        });
+
+        const setupSubmissionForm = (type) => {
+             const titleEl = document.getElementById('submission-title');
+             const typeInput = document.getElementById('submission-type');
+             const textLabel = document.getElementById('submission-text-label');
+             const linkContainer = document.getElementById('link-field-container');
+
+             typeInput.value = type;
+             if(type === 'memory'){
+                titleEl.textContent = 'Share Your Memory';
+                textLabel.textContent = 'Your Memory';
+                linkContainer.style.display = 'none';
+             } else {
+                titleEl.textContent = 'Submit Your Tribute';
+                textLabel.textContent = 'Description';
+                linkContainer.style.display = 'block';
+             }
+            openModal(submissionModal);
+        }
+
+        document.getElementById('add-memory-btn').addEventListener('click', () => setupSubmissionForm('memory'));
+        document.getElementById('add-tribute-btn').addEventListener('click', () => setupSubmissionForm('tribute'));
+
+        document.getElementById('submission-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.id = Date.now();
+            
+            if (data.type === 'memory') {
+                memories.push(data);
+                saveToStorage(STORAGE_KEYS.MEMORIES, memories);
+                renderMemoryCarousel();
+            } else {
+                tributes.push(data);
+                saveToStorage(STORAGE_KEYS.TRIBUTES, tributes);
+                renderTributes();
+            }
+            
+            renderAllMarkers();
+            e.target.reset();
+            closeModal();
+        });
+        
+        candleBtn.addEventListener('click', handleCandleClick);
+        document.getElementById('cancel-candle').addEventListener('click', closeModal);
+        document.getElementById('cancel-submission').addEventListener('click', closeModal);
+
+        // Initial render
+        renderCandleStats();
+        renderMemoryCarousel();
+        startMemoryCarousel();
+        renderTributes();
+        renderAllMarkers();
     });
-    layer.addTo(map);
-    map._pinsLayer = layer;
-  }
-
-  el('add-pin-btn').addEventListener('click', ()=>{
-    alert('Click on the map to add a pin. A prompt will ask for details.');
-    const onClick = function(e){
-      map.off('click', onClick);
-      const title = prompt('Title of this memory (e.g., "First concert")') || 'Memory';
-      const text = prompt('Short message (optional)') || '';
-      pins.push({id:Date.now(), lat:e.latlng.lat, lng:e.latlng.lng, title, text});
-      saveToStorage(STORAGE_KEYS.PINS, pins);
-      renderPins();
-    };
-    map.on('click', onClick);
-  });
-
-  el('export-pins').addEventListener('click', ()=> downloadFile('joyzubeen_pins.json', JSON.stringify(pins, null, 2)));
-
-  el('import-pins-btn').addEventListener('click', ()=> el('import-pins-file').click());
-  el('import-pins-file').addEventListener('change', (ev)=>{
-    const f = ev.target.files[0]; if(!f) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        try {
-            const parsed = JSON.parse(e.target.result);
-            if (Array.isArray(parsed)) {
-                pins = [...new Map(pins.concat(parsed).map(item => [item.id, item])).values()];
-                saveToStorage(STORAGE_KEYS.PINS, pins);
-                renderPins();
-                alert('Pins imported.');
-            } else { alert('Pins JSON not recognized.'); }
-        } catch(err) { alert('Invalid JSON'); }
-    };
-    reader.readAsText(f);
-  });
-
-  /* ------------------------------
-     Virtual candles
-     ------------------------------ */
-  let candles = loadFromStorage(STORAGE_KEYS.CANDLES, []);
-  function renderCandles(){
-    const area = el('candle-area');
-    area.innerHTML = '';
-    if(!candles.length) area.innerHTML = '<div class="small muted">No candles lit yet — be the first.</div>';
-    candles.forEach(c=>{
-      const d = document.createElement('div');
-      d.className='candle';
-      d.title = `${c.name} · ${new Date(c.created_at).toLocaleString()}`;
-      area.appendChild(d);
-    });
-  }
-  el('light-candle').addEventListener('click', ()=>{
-    const me = prompt('Your name to appear with the candle (optional)') || 'Anonymous';
-    candles.push({id:Date.now(), name:me, created_at:new Date().toISOString()});
-    saveToStorage(STORAGE_KEYS.CANDLES, candles);
-    renderCandles();
-  });
-  
-  /* ------------------------------
-     Share / social buttons
-     ------------------------------ */
-  el('share-twitter').addEventListener('click', ()=>{
-    const text = encodeURIComponent('Remembering Zubeen Garg — join the global fan tribute. #JoyZubeenDa');
-    const url = encodeURIComponent('https://joyzubeenda.com'); // Use your final domain
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-  });
-  el('share-fb').addEventListener('click', ()=> window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://joyzubeenda.com')}`, '_blank'));
-  el('copy-link').addEventListener('click', ()=> navigator.clipboard.writeText('https://joyzubeenda.com').then(()=> alert('Link copied!')));
-
-  /* ------------------------------
-     Initial Load
-     ------------------------------ */
-  window.addEventListener('load', ()=>{
-    initMap();
-    renderSubmissions();
-    renderCandles();
-    const savedLang = loadFromStorage(STORAGE_KEYS.LANG, 'en');
-    setLang(savedLang);
-  });
-
-  // simple URL helpers
-  el('go-to-map').addEventListener('click', ()=> el('map').scrollIntoView({behavior:'smooth'}));
-  el('go-to-hub').addEventListener('click', ()=> el('fan-list').scrollIntoView({behavior:'smooth'}));
-
-  </script>
+    </script>
 </body>
 </html>
+
