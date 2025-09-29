@@ -1,12 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Joy Zubeenda — Remembering Zubeen Garg</title>
-
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital@0;1&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -16,243 +13,793 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  :root {
+  /* ---------- Theme & layout ---------- */
+  :root{
     --accent:#0b74ff;
     --bg:#f6f7fb;
     --card:#ffffff;
     --text:#0b1726;
-    --muted:#667085;
-    --card-shadow:0 6px 22px rgba(10,20,40,0.06);
-    --hero-accent:#ff784f;
+    --muted:#556;
+    --glass: rgba(11,23,38,0.03);
+    --card-shadow: 0 6px 22px rgba(10,20,40,0.06);
     --max-width:1200px;
   }
-  body {
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:var(--bg);
-    color:var(--text);
-  }
-  .dark {
-    --bg:#0b1220;
-    --card:#0f1724;
-    --text:#e6eef8;
-    --muted:#9aa9c3;
-    --card-shadow:0 8px 30px rgba(0,0,0,0.6);
-  }
-  .wrap { max-width:var(--max-width); margin:auto; padding:20px; }
-  header { display:flex; justify-content:space-between; align-items:center; }
-  .hero h1 {
-    font-size:42px;
-    font-family:'Merriweather',serif;
-    margin:0;
-  }
-  .hero .tagline {
-    font-style:italic;
-    color:var(--hero-accent);
-    font-size:18px;
-    margin-top:6px;
-  }
-  .card {
-    background:var(--card);
-    border-radius:12px;
-    padding:16px;
-    box-shadow:var(--card-shadow);
-    margin-top:20px;
-    background-image:linear-gradient(135deg,rgba(11,116,255,0.03),rgba(255,120,79,0.03));
-  }
-  .section-title { font-size:20px; font-weight:600; }
-  button {
-    cursor:pointer;
-    border:none;
-    border-radius:8px;
-    padding:10px 14px;
-    font-weight:600;
-  }
-  .btn-primary { background:var(--accent); color:white; }
-  .btn-ghost { background:transparent; border:1px solid rgba(0,0,0,0.08); }
-  .counter { font-size:32px; font-weight:700; }
-  .candle {
-    width:14px;height:36px;
-    border-radius:6px;
-    background:linear-gradient(180deg,#ffdd88,#ffb347);
-    margin:3px;
-    position:relative;
-  }
-  .candle:after {
-    content:''; position:absolute; top:-8px; left:50%;
-    transform:translateX(-50%);
-    width:4px;height:8px;
-    border-radius:4px;
-    background:white;
-  }
-  .candle.glow {
-    box-shadow:0 0 22px rgba(255,160,30,0.6);
-    transform:translateY(-3px);
-  }
-  .map-container { height:340px; border-radius:12px; overflow:hidden; }
-  .ticker {
-    background:var(--accent); color:white;
-    padding:8px;
-    position:fixed; bottom:0; width:100%;
-    white-space:nowrap; overflow:hidden;
-  }
-  .ticker span {
-    display:inline-block;
-    padding-right:50px;
-    animation:scroll 18s linear infinite;
-  }
-  @keyframes scroll { from{transform:translateX(100%)} to{transform:translateX(-100%)} }
-  /* Quote carousel */
-  .quotes { margin:20px 0; font-style:italic; color:var(--muted); text-align:center; }
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  .dark{--bg:#0b1220;--card:#0f1724;--text:#e6eef8;--muted:#9aa9c3;--glass: rgba(255,255,255,0.03);--card-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .wrap{max-width:var(--max-width);margin:18px auto;padding:18px}
+  header{display:flex;gap:20px;align-items:center;justify-content:space-between}
+  .brand{display:flex;gap:16px;align-items:center}
+  .logo{width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#66a6ff);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px;box-shadow:var(--card-shadow)}
+  .hero-text{max-width:900px}
+  h1{font-size:34px;margin:0;line-height:1.05}
+  .tagline{margin-top:8px;color:var(--muted);font-size:15px}
+  .controls{display:flex;gap:10px;align-items:center}
+  button{cursor:pointer;padding:8px 12px;border-radius:8px;border:0}
+  .btn-primary{background:var(--accent);color:white;box-shadow:0 6px 20px rgba(11,116,255,0.12)}
+  .btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text)}
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:18px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--card-shadow)}
+  .section-title{font-size:18px;margin:0 0 8px 0}
+  .muted{color:var(--muted);font-size:13px}
+  .counter{font-size:28px;font-weight:700;margin-top:6px}
+  .virtual-candles{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .candle{width:14px;height:36px;border-radius:6px;background:linear-gradient(180deg,#ffdd88,#ffb347);position:relative;box-shadow:0 8px 18px rgba(255,120,20,0.12)}
+  .candle:after{content:'';position:absolute;left:50%;transform:translateX(-50%);top:-8px;width:4px;height:8px;border-radius:6px;background:#fff;filter:drop-shadow(0 6px 12px rgba(255,200,60,0.25))}
+  .candle.glow{box-shadow:0 8px 32px rgba(255,140,40,0.35), 0 0 22px rgba(255,160,30,0.18);transform:translateY(-3px)}
+  .small{font-size:13px}
+  .row{display:flex;gap:8px;align-items:center}
+  input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(10,20,30,0.06);font-size:14px}
+  textarea{resize:vertical}
+  .media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:800px){.media-grid{grid-template-columns:repeat(2,1fr)}}
+  .media-item{background:var(--glass);padding:8px;border-radius:8px}
+  .footer{margin-top:18px;text-align:center;color:var(--muted)}
+  .badge{background:rgba(11,116,255,0.09);padding:6px 10px;border-radius:999px;color:var(--accent);font-weight:600}
+  .top-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .stat{background:rgba(0,0,0,0.03);padding:10px;border-radius:8px;text-align:center;min-width:120px}
+  .stat strong{display:block;font-size:18px}
+  .controls small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .import-export{display:flex;gap:8px;margin-top:8px}
+  .map-container{height:360px;border-radius:8px;overflow:hidden}
+  .pill{background:rgba(0,0,0,0.03);padding:6px 10px;border-radius:999px}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="pageWrap">
 
-  <!-- Hero -->
+  <!-- Header / Hero -->
   <header>
-    <div class="hero">
-      <h1>Remembering Zubeen Garg</h1>
-      <div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
+    <div class="brand">
+      <div class="logo">JZ</div>
+      <div class="hero-text">
+        <h1>Remembering Zubeen Garg</h1>
+        <div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
+      </div>
     </div>
-    <div>
-      <button id="modeToggle" class="btn-ghost">Toggle Dark</button>
+
+    <div class="controls">
+      <div class="pill small" id="modeLabel">Light Mode</div>
+      <button id="modeToggle" class="btn-ghost">Switch</button>
+      <div style="width:8px"></div>
+      <button id="exportBtn" class="btn-ghost">Export Data</button>
+      <button id="importBtn" class="btn-ghost">Import Data</button>
+      <input type="file" id="importFile" style="display:none" accept=".json"/>
     </div>
   </header>
 
-  <!-- Candle Section -->
-  <section class="card" id="candleCard">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div class="section-title">🕯️ Light a Virtual Candle</div>
-        <div class="muted">Join fans and honor Zubeen’s eternal legacy.</div>
+  <div class="grid">
+    <!-- LEFT: main content -->
+    <main>
+      <!-- Candle + Stats -->
+      <section class="card" id="candleCard">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="section-title">🕯️ Light a Virtual Candle</div>
+            <div class="muted">Join fans and light a candle to honor Zubeen's legacy.</div>
+            <div class="hint">One candle per visitor (IP-based best-effort). You can choose country, state & Assam district.</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">Candles Lit</div>
+            <div class="counter" id="candleCount">0</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="row">
+          <button id="openCandleModal" class="btn-primary">Light Candle</button>
+          <button id="viewTop" class="btn-ghost">Top regions</button>
+          <div style="flex:1"></div>
+        </div>
+
+        <div class="virtual-candles" id="candleArea" aria-hidden="true"></div>
+
+        <div style="margin-top:14px;display:flex;gap:12px;align-items:center">
+          <canvas id="candleChart" style="max-width:420px"></canvas>
+          <div style="flex:1">
+            <div class="top-stats">
+              <div class="stat"><small>Top State</small><strong id="topState">—</strong></div>
+              <div class="stat"><small>Top District (Assam)</small><strong id="topDistrict">—</strong></div>
+              <div class="stat"><small>Top Country</small><strong id="topCountry">—</strong></div>
+            </div>
+            <div class="hint">Click candle to light — duplicates prevented by IP & browser storage.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Memory Wall + form -->
+      <section class="card" id="memoryCard" style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="section-title">🖼️ Interactive Memory Wall</div>
+            <div class="muted"><span id="memoryCount">0</span> memories shared</div>
+          </div>
+          <div>
+            <button id="openMemoryForm" class="btn-primary">Share Memory</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div id="memoryWall" style="height:160px;overflow:hidden;border-radius:8px;padding:8px;background:linear-gradient(180deg,rgba(0,0,0,0.02),transparent)"></div>
+        </div>
+
+        <div style="margin-top:12px" class="muted">Tip: submit your memory with name, email, city/institute, and it will appear on the map and wall.</div>
+      </section>
+
+      <!-- Fan Tributes Hub -->
+      <section class="card" style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="section-title">🎶 Fan Tributes Hub</div>
+            <div class="muted"><span id="tributeCount">0</span> tributes featured</div>
+          </div>
+          <div><button id="openTributeForm" class="btn-primary">Upload Tribute</button></div>
+        </div>
+
+        <div style="margin-top:12px" id="tribeGallery" class="media-grid"></div>
+
+        <div style="margin-top:12px" class="muted">Allowed: small image files (fan art) and short audio clips. Files are stored locally (use Export to save centrally).</div>
+      </section>
+
+      <!-- Timeline / Short bio -->
+      <section class="card" style="margin-top:16px">
+        <div class="section-title">📜 Timeline & Beliefs</div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:1">
+            <p><strong>1972</strong> — Born. Early musical interest.</p>
+            <p><strong>2000s</strong> — Became a multi-lingual recording artist, singing in 40+ languages.</p>
+            <p><strong>2010s</strong> — Social activism & animal rights. Treated everyone equally; championed cultural pride.</p>
+            <p><strong>Legacy</strong> — A powerful voice across India & abroad; celebrated by fans worldwide.</p>
+          </div>
+          <div style="width:240px">
+            <div class="card small">
+              <div class="small muted">Notable</div>
+              <div style="margin-top:6px"><strong>40+</strong> languages</div>
+              <div><strong>38,000+</strong> songs (recorded)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- RIGHT: sidebar -->
+    <aside>
+      <!-- Map -->
+      <div class="card map-card">
+        <div class="section-title">🌍 Global Legacy Map</div>
+        <div class="muted">Show pins from memories & tributes — countries represented: <strong id="countryCount">0</strong></div>
+        <div class="map-container" id="map"></div>
       </div>
-      <div style="text-align:right">
-        <div class="muted">Candles Lit</div>
-        <div class="counter" id="candleCount">0</div>
+
+      <!-- Quick stats -->
+      <div class="card" style="margin-top:14px">
+        <div class="section-title">Live Stats</div>
+        <div class="stat" style="text-align:left">
+          <small>Total Candles</small>
+          <strong id="statCandles">0</strong>
+        </div>
+        <div style="height:10px"></div>
+        <div class="stat" style="text-align:left">
+          <small>Memories</small>
+          <strong id="statMemories">0</strong>
+        </div>
+        <div style="height:10px"></div>
+        <div class="stat" style="text-align:left">
+          <small>Tributes</small>
+          <strong id="statTributes">0</strong>
+        </div>
+
+        <div style="margin-top:12px" class="import-export">
+          <button id="downloadAll" class="btn-ghost">Download JSON</button>
+          <button id="clearLocal" class="btn-ghost">Clear Local</button>
+        </div>
       </div>
-    </div>
-    <div style="margin-top:12px" class="row">
-      <button id="openCandleModal" class="btn-primary">Light Candle</button>
-    </div>
-    <div class="virtual-candles" id="candleArea"></div>
-    <canvas id="candleChart" style="max-height:220px;margin-top:12px"></canvas>
-  </section>
 
-  <!-- Memory Wall -->
-  <section class="card">
-    <div class="section-title">🖼️ Interactive Memory Wall</div>
-    <div class="muted"><span id="memoryCount">0</span> memories shared</div>
-    <button id="openMemoryForm" class="btn-primary" style="margin-top:10px">Share a Memory</button>
-    <div id="memoryWall" style="margin-top:12px;max-height:180px;overflow-y:auto;"></div>
-  </section>
+      <!-- Top lists -->
+      <div class="card" style="margin-top:14px">
+        <div class="section-title">Top Regions</div>
+        <div class="muted">Top 5 states (candles)</div>
+        <ol id="topStatesList"></ol>
+        <div class="muted">Top Assam districts</div>
+        <ol id="topDistrictsList"></ol>
+      </div>
+    </aside>
+  </div>
 
-  <!-- Tributes -->
-  <section class="card">
-    <div class="section-title">🎶 Fan Tributes Hub</div>
-    <div class="muted"><span id="tributeCount">0</span> tributes featured</div>
-    <button id="openTributeForm" class="btn-primary" style="margin-top:10px">Share a Tribute</button>
-    <div id="tributeWall" style="margin-top:12px;max-height:180px;overflow-y:auto;"></div>
-  </section>
-
-  <!-- Global Map -->
-  <section class="card">
-    <div class="section-title">🌍 Global Legacy Map</div>
-    <div class="map-container" id="map"></div>
-  </section>
-
-  <!-- Timeline -->
-  <section class="card">
-    <div class="section-title">📜 Timeline & Beliefs</div>
-    <p><strong>1972</strong> — Born, early love for music.</p>
-    <p><strong>2000s</strong> — Multilingual artist, 40+ languages.</p>
-    <p><strong>2010s</strong> — Activism, equality, compassion.</p>
-    <p><strong>Legacy</strong> — A voice that lives forever.</p>
-  </section>
-
-  <!-- Quotes -->
-  <section class="card quotes">
-    <div id="quoteCarousel">“Music is not bound by borders.”</div>
-  </section>
-
-  <!-- Merchandise Placeholder -->
-  <!-- <section class="card">🛍️ Merchandise coming soon</section> -->
-
+  <div class="footer">
+    Built with ❤️ for Zubeen-da. No commerce. Data stored locally until you enable a backend.
+  </div>
 </div>
 
-<!-- Ticker -->
-<div class="ticker"><span id="tickerText">Latest candles lit will appear here...</span></div>
+<!-- ---------- Modals (Candle, Memory, Tribute) ---------- -->
+<!-- Candle Modal -->
+<div id="candleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;z-index:9999">
+  <div style="width:100%;max-width:720px;background:var(--card);padding:18px;border-radius:12px;">
+    <h3 style="margin:0 0 8px 0">Light a Candle</h3>
+    <div class="muted">Choose your location (country defaults to India). One candle per visitor/IP.</div>
+
+    <div style="margin-top:12px">
+      <label class="small">Name (optional)</label>
+      <input id="candleName" placeholder="Your name (or leave blank)" />
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <div style="flex:1">
+        <label class="small">Country</label>
+        <select id="candleCountry"></select>
+      </div>
+      <div style="flex:1">
+        <label class="small">State (India)</label>
+        <select id="candleState"></select>
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label class="small">District (If Assam)</label>
+      <select id="candleDistrict"></select>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+      <button id="candleCancel" class="btn-ghost">Cancel</button>
+      <button id="candleSubmit" class="btn-primary">Light Candle</button>
+    </div>
+    <div id="candleMsg" class="muted" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- Memory Modal -->
+<div id="memoryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;z-index:9999">
+  <div style="width:100%;max-width:820px;background:var(--card);padding:18px;border-radius:12px;">
+    <h3 style="margin:0 0 8px 0">Share a Memory</h3>
+    <div class="muted">Share your story, photo or video link. Your submission will be shown on the Memory Wall and map.</div>
+
+    <form id="memoryForm" style="margin-top:12px;display:grid;gap:8px">
+      <div style="display:flex;gap:8px">
+        <input name="name" placeholder="Your name (or anonymous)" />
+        <input name="email" placeholder="Email (optional)" />
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <input name="city" placeholder="City / Town" />
+        <input name="institute" placeholder="Institute / Profession" />
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <select name="country" id="memCountry"></select>
+        <select name="state" id="memState"></select>
+      </div>
+
+      <div>
+        <textarea name="text" rows="4" placeholder="Write your memory, add a YouTube link, or paste an image URL"></textarea>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button type="button" id="memoryCancel" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Submit Memory</button>
+      </div>
+      <div id="memoryMsg" class="muted"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Tribute Modal (upload image/audio) -->
+<div id="tributeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;z-index:9999">
+  <div style="width:100%;max-width:720px;background:var(--card);padding:18px;border-radius:12px;">
+    <h3 style="margin:0 0 8px 0">Upload a Tribute</h3>
+    <div class="muted">Upload small fan art images or short audio covers (max ~2.5MB). Files are stored locally; export to save centrally.</div>
+
+    <form id="tributeForm" style="margin-top:12px;display:grid;gap:8px">
+      <div style="display:flex;gap:8px">
+        <input name="tname" placeholder="Your name" />
+        <input name="tcity" placeholder="City" />
+      </div>
+      <div>
+        <input type="file" id="tributeFile" accept="image/*,audio/*" />
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button type="button" id="tributeCancel" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Upload</button>
+      </div>
+      <div id="tributeMsg" class="muted"></div>
+    </form>
+  </div>
+</div>
 
 <script>
-// Mode toggle
-document.getElementById('modeToggle').onclick=()=>{
-  document.body.classList.toggle('dark');
-};
+/*
+  Full client-side tribute site logic.
+  - Data stored in localStorage under key JOY_DATA_V1
+  - Use ipify to fetch visitor public IP to restrict one candle per IP (best-effort).
+  - File uploads are base64 encoded and stored (watch for size limits).
+  - Export / Import JSON to centralize data later.
+  - Map pins rendered with Leaflet.
+  - Charts via Chart.js
+*/
 
-// Dummy data handling
-let candles=[],memories=[],tributes=[];
-const candleCountEl=document.getElementById('candleCount');
-const candleArea=document.getElementById('candleArea');
-const ticker=document.getElementById('tickerText');
+/* ---------- UTIL ---------- */
+const STORAGE_KEY = 'JOY_DATA_V1';
+function loadData(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {candles:[],memories:[],tributes:[]} } catch(e){ return {candles:[],memories:[],tributes:[]} } }
+function saveData(d){ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+function download(filename, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json'})); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); }
+function formatN(n){ return n.toLocaleString(); }
 
-// Light candle
-document.getElementById('openCandleModal').onclick=()=>{
-  const entry={id:Date.now(),country:"India",state:"Assam",district:"Guwahati"};
-  candles.push(entry);
-  render();
-  // glowing candle
-  const el=document.createElement('div');el.className="candle glow";candleArea.prepend(el);
-  setTimeout(()=>el.classList.remove('glow'),2000);
-  ticker.textContent="Latest candles lit from Guwahati, Assam, India";
-};
+/* ---------- DATA & INITIALIZATION ---------- */
+let JOY = loadData(); // {candles:[], memories:[], tributes:[]}
+const pageWrap = document.getElementById('pageWrap');
+const candleCountEl = document.getElementById('candleCount');
+const candleArea = document.getElementById('candleArea');
+const memoryWall = document.getElementById('memoryWall');
+const memoryCountEl = document.getElementById('memoryCount');
+const tributeCountEl = document.getElementById('tributeCount');
+const statCandles = document.getElementById('statCandles');
+const statMemories = document.getElementById('statMemories');
+const statTributes = document.getElementById('statTributes');
+const topStateEl = document.getElementById('topState');
+const topDistrictEl = document.getElementById('topDistrict');
+const topCountryEl = document.getElementById('topCountry');
+const topStatesList = document.getElementById('topStatesList');
+const topDistrictsList = document.getElementById('topDistrictsList');
+const countryCountEl = document.getElementById('countryCount');
 
-// Memory
-document.getElementById('openMemoryForm').onclick=()=>{
-  const entry={id:Date.now(),text:"Zubeen’s songs healed my soul.",name:"Fan"};
-  memories.push(entry);
-  render();
-};
+/* ---------- Country / State / Assam districts lists (static) ---------- */
+/* Countries: simple list for dropdown; can be replaced with a CDN/API if desired */
+const COUNTRIES = ["India","United States","United Kingdom","Canada","Australia","Bangladesh","Nepal","Bhutan","United Arab Emirates","Singapore","Malaysia","Germany","France","Others"];
+/* India states - simplified list */
+const INDIA_STATES = ["Assam","Arunachal Pradesh","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andhra Pradesh","Jammu & Kashmir","Ladakh"];
+/* Assam districts (example list - common districts; extend as needed) */
+const ASSAM_DISTRICTS = ["Jorhat","Guwahati","Dibrugarh","Tezpur","Silchar","Nagaon","Sivasagar","Tinsukia","Golaghat","Dhemaji","Lakhimpur","Barpeta","Bongaigaon","Karimganj","Kamrup","Kamrup Metro","Morigaon","Sonitpur"];
 
-// Tribute
-document.getElementById('openTributeForm').onclick=()=>{
-  const entry={id:Date.now(),text:"Shared my cover of his classic.",name:"Singer"};
-  tributes.push(entry);
-  render();
-};
-
-function render(){
-  candleCountEl.textContent=candles.length;
-  candleArea.innerHTML="";
-  candles.slice(-20).forEach(()=>{let d=document.createElement('div');d.className="candle";candleArea.appendChild(d);});
-  document.getElementById('memoryCount').textContent=memories.length;
-  document.getElementById('memoryWall').innerHTML=memories.map(m=>`<p><strong>${m.name}</strong>: ${m.text}</p>`).join("");
-  document.getElementById('tributeCount').textContent=tributes.length;
-  document.getElementById('tributeWall').innerHTML=tributes.map(t=>`<p><strong>${t.name}</strong>: ${t.text}</p>`).join("");
-  candleChart.data.datasets[0].data=[candles.length,Math.floor(candles.length/2),2,1];
-  candleChart.update();
+/* ---------- UI wiring: mode toggle, export/import, clear ---------- */
+const modeToggle = document.getElementById('modeToggle');
+const modeLabel = document.getElementById('modeLabel');
+let isDark = false;
+function setMode(d){
+  isDark = d;
+  if(d) document.documentElement.classList.add('dark'), document.body.classList.add('dark'), modeLabel.textContent='Dark Mode';
+  else document.documentElement.classList.remove('dark'), document.body.classList.remove('dark'), modeLabel.textContent='Light Mode';
 }
+modeToggle.onclick = ()=> setMode(!isDark);
+setMode(false);
 
-// Chart.js
-const ctx=document.getElementById('candleChart').getContext('2d');
-const candleChart=new Chart(ctx,{
-  type:'bar',
-  data:{labels:["India","States","Districts","Countries"],datasets:[{data:[0,0,0,0],backgroundColor:["#f59e0b","#60a5fa","#34d399","#a3a3a3"]}]},
-  options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+/* Export / Import */
+document.getElementById('exportBtn').onclick = ()=> { download('joyzubeen_export.json', JSON.stringify(JOY, null,2)); };
+document.getElementById('downloadAll').onclick = ()=> { download('joyzubeen_full_export.json', JSON.stringify(JOY, null,2)); };
+document.getElementById('importBtn').onclick = ()=> document.getElementById('importFile').click();
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = (ev)=> {
+    try{
+      const parsed = JSON.parse(ev.target.result);
+      if(parsed.candles && parsed.memories && parsed.tributes){
+        JOY = parsed;
+        saveData(JOY);
+        renderAll();
+        alert('Imported data successfully');
+      } else { alert('JSON format not recognized. Expected export created by this site.'); }
+    }catch(err){ alert('Invalid JSON'); }
+  };
+  r.readAsText(f);
+});
+document.getElementById('clearLocal').onclick = ()=>{
+  if(!confirm('Clear all local data? This will remove all saved tributes and candles from this browser.')) return;
+  JOY = {candles:[],memories:[],tributes:[]}; saveData(JOY); renderAll();
+};
+
+/* ---------- Candle: modal population & logic ---------- */
+const candleModal = document.getElementById('candleModal');
+const openCandleModal = document.getElementById('openCandleModal');
+const candleCountry = document.getElementById('candleCountry');
+const candleState = document.getElementById('candleState');
+const candleDistrict = document.getElementById('candleDistrict');
+const candleName = document.getElementById('candleName');
+const candleSubmit = document.getElementById('candleSubmit');
+const candleCancel = document.getElementById('candleCancel');
+const candleMsg = document.getElementById('candleMsg');
+
+function populateDropdowns(){
+  // countries
+  COUNTRIES.forEach(c=> {
+    const o=document.createElement('option'); o.value=c; o.textContent=c; candleCountry.appendChild(o);
+    const o2=document.createElement('option'); o2.value=c; o2.textContent=c; document.getElementById('memCountry').appendChild(o2);
+  });
+  // states
+  const defaultOpt = document.createElement('option'); defaultOpt.value=''; defaultOpt.textContent='Select state (India)';
+  candleState.appendChild(defaultOpt);
+  const memState = document.getElementById('memState');
+  const memDefault = document.createElement('option'); memDefault.value=''; memDefault.textContent='Select state (India)';
+  memState.appendChild(memDefault);
+  INDIA_STATES.forEach(s=>{
+    const o=document.createElement('option'); o.value=s; o.textContent=s; candleState.appendChild(o);
+    const o2=document.createElement('option'); o2.value=s; o2.textContent=s; memState.appendChild(o2);
+  });
+  // districts for Assam
+  const dDefault = document.createElement('option'); dDefault.value=''; dDefault.textContent='Select district (Assam)';
+  candleDistrict.appendChild(dDefault);
+  ASSAM_DISTRICTS.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; candleDistrict.appendChild(o); });
+}
+populateDropdowns();
+
+// toggle district visibility when Assam selected
+candleState.addEventListener('change', ()=> {
+  if(candleState.value === 'Assam'){ candleDistrict.style.display='block'; } else { candleDistrict.style.display='none'; candleDistrict.value=''; }
 });
 
-// Leaflet Map
-const map=L.map('map').setView([26.14,91.79],4);
+// open modal
+openCandleModal.onclick = () => {
+  candleMsg.textContent = '';
+  candleName.value = '';
+  candleCountry.value = 'India';
+  candleState.value = '';
+  candleDistrict.value = '';
+  candleDistrict.style.display = 'none';
+  candleModal.style.display = 'flex';
+  // attempt to geolocate (optional)
+  try { if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(()=>{},()=>{}); } } catch(e){}
+};
+
+// cancel
+candleCancel.onclick = ()=> candleModal.style.display='none';
+
+// helper: get visitor IP (best-effort)
+async function getVisitorIP(){
+  try{
+    const r = await fetch('https://api.ipify.org?format=json'); // public, CORS-enabled
+    const j = await r.json(); return j.ip;
+  }catch(e){ return null; }
+}
+
+// dedupe check: localStorage key for IPs: JOY_IP_{ip}
+async function canLight(ip){
+  if(!ip) return true; // if IP cannot be fetched, allow (we still use browser localStorage flag)
+  const key = 'JOY_IP_' + ip;
+  if(localStorage.getItem(key)) return false;
+  return true;
+}
+function markLitByIP(ip){
+  if(!ip) return;
+  const key = 'JOY_IP_' + ip;
+  localStorage.setItem(key, 'true');
+}
+
+/* Candle submission */
+candleSubmit.onclick = async ()=>{
+  candleMsg.textContent = '';
+  candleSubmit.disabled = true;
+  const ip = await getVisitorIP(); // may be null if blocked
+  const allowed = await canLight(ip);
+  if(!allowed){ candleMsg.textContent = 'You have already lit a candle from this IP/browser. Thank you.'; candleSubmit.disabled=false; return; }
+
+  // read form
+  const name = candleName.value.trim() || 'Anonymous';
+  const country = candleCountry.value || 'India';
+  const state = candleState.value || '';
+  const district = candleDistrict.value || '';
+  const entry = { id: Date.now(), name, country, state, district, ts: new Date().toISOString(), ip: ip || 'unknown' };
+  JOY.candles.push(entry);
+  saveData(JOY);
+  markLitByIP(ip);
+  candleModal.style.display = 'none';
+  renderAll();
+  // animate a glowing candle
+  addGlowingCandle();
+  candleSubmit.disabled = false;
+  // TODO: optionally: POST to backend endpoint
+};
+
+/* add glowing candle on success */
+function addGlowingCandle(){
+  const el = document.createElement('div'); el.className='candle glow';
+  candleArea.prepend(el);
+  setTimeout(()=> el.classList.remove('glow'), 2200);
+}
+
+/* ---------- Memory modal ---------- */
+const memoryModal = document.getElementById('memoryModal');
+const openMemoryForm = document.getElementById('openMemoryForm');
+const memoryForm = document.getElementById('memoryForm');
+const memoryCancel = document.getElementById('memoryCancel');
+const memoryMsg = document.getElementById('memoryMsg');
+
+openMemoryForm.onclick = ()=> {
+  memoryForm.reset(); memoryMsg.textContent=''; memoryModal.style.display='flex';
+  // set defaults
+  document.getElementById('memCountry').value = 'India';
+  document.getElementById('memState').value = '';
+  // if Assam selected on memState, we could show district but for simplicity memory form uses state only
+};
+memoryCancel.onclick = ()=> memoryModal.style.display='none';
+
+memoryForm.addEventListener('submit', (ev)=>{
+  ev.preventDefault();
+  const fd = new FormData(memoryForm);
+  const obj = {
+    id: Date.now(),
+    name: fd.get('name') || 'Anonymous',
+    email: fd.get('email') || '',
+    city: fd.get('city') || '',
+    institute: fd.get('institute') || '',
+    country: fd.get('country') || 'India',
+    state: fd.get('state') || '',
+    text: fd.get('text') || '',
+    ts: new Date().toISOString()
+  };
+  JOY.memories.push(obj);
+  saveData(JOY);
+  memoryModal.style.display = 'none';
+  renderAll();
+  // You can optionally POST obj to your backend here.
+});
+
+/* ---------- Tribute modal (upload) ---------- */
+const tributeModal = document.getElementById('tributeModal');
+const openTributeForm = document.getElementById('openTributeForm');
+const tributeForm = document.getElementById('tributeForm');
+const tributeFile = document.getElementById('tributeFile');
+const tributeMsg = document.getElementById('tributeMsg');
+const tributeCancel = document.getElementById('tributeCancel');
+
+openTributeForm.onclick = ()=> { tributeForm.reset(); tributeModal.style.display='flex'; tributeMsg.textContent=''; };
+tributeCancel.onclick = ()=> tributeModal.style.display='none';
+
+tributeForm.addEventListener('submit', (ev)=>{
+  ev.preventDefault();
+  const tfd = new FormData(tributeForm);
+  const file = tributeFile.files[0];
+  if(!file){ tributeMsg.textContent='Select an image or audio file to upload.'; return; }
+  if(file.size > 2_800_000){ tributeMsg.textContent='File too large. Max ~2.5MB.'; return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const base64 = e.target.result; // data:*/*;base64,...
+    const entry = {
+      id: Date.now(),
+      name: tfd.get('tname') || 'Anonymous',
+      city: tfd.get('tcity') || '',
+      filename: file.name,
+      mime: file.type,
+      data: base64,
+      ts: new Date().toISOString()
+    };
+    JOY.tributes.push(entry);
+    saveData(JOY);
+    tributeModal.style.display='none';
+    renderAll();
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ---------- Map & Leaflet ---------- */
+const map = L.map('map', { attributionControl:false }).setView([26.14,91.79], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+let markersLayer = L.layerGroup().addTo(map);
 
-// Quotes rotation
-const quotes=[
- "“Music is not bound by borders.”",
- "“Equality is the true rhythm of life.”",
- "“Zubeen-da lives in every note.”"
-];
-let qi=0;setInterval(()=>{qi=(qi+1)%quotes.length;document.getElementById('quoteCarousel').textContent=quotes[qi];},4000);
+function renderMapPins(){
+  markersLayer.clearLayers();
+  // Memories: attempt geocoding using city -> approximate coords (we don't do geocoding here; for demo, place Assam / India pins differently)
+  JOY.memories.forEach(m=>{
+    let coords = approxCoordsForCity(m.city, m.country, m.state);
+    if(coords){
+      const mk = L.marker(coords).bindPopup(`<strong>${escapeHtml(m.name)}</strong><div class="small">${escapeHtml(m.city)} ${m.state?(', '+escapeHtml(m.state)):''}</div><div style="margin-top:6px">${escapeHtml(truncate(m.text,120))}</div>`);
+      markersLayer.addLayer(mk);
+    }
+  });
+  // Candles
+  JOY.candles.forEach(c=>{
+    let coords = approxCoordsForCity(c.district || c.state || c.country, c.country, c.state);
+    if(coords){
+      const mk = L.circleMarker(coords, {radius:6, color:'#ffb347'}).bindPopup(`<strong>Candle</strong><div class="small">${escapeHtml(c.name)} • ${escapeHtml(c.district||c.state||c.country)}</div>`);
+      markersLayer.addLayer(mk);
+    }
+  });
+  // Tributes: cluster near points (use same approx logic)
+  JOY.tributes.forEach(t=>{
+    let coords = approxCoordsForCity(t.city || '', 'India', '');
+    if(coords){
+      const mk = L.marker(coords).bindPopup(`<strong>${escapeHtml(t.name)}</strong><div class="small">${escapeHtml(t.city)}</div><div style="margin-top:6px">File: ${escapeHtml(t.filename)}</div>`);
+      markersLayer.addLayer(mk);
+    }
+  });
+}
 
-render();
+/* very small approximate coords mapping for demo (not production geocoding) */
+function approxCoordsForCity(city, country, state){
+  if(!city && !state && !country) return null;
+  // rough guesses for certain well-known places
+  const c = (city||'').toLowerCase();
+  if(c.includes('guwahati') || (state && state==='Assam' && (city==='Guwahati' || city==='')) ) return [26.1445,91.7362];
+  if(c.includes('jorhat')) return [26.7466,94.2026];
+  if(c.includes('dibrugarh')) return [27.4728,94.9113];
+  if(c.includes('tezu')||c.includes('tezu')) return [27.9915,96.1469];
+  if(country && country !== 'India') return [20,0]; // placeholder for international pin
+  // fallback: random nearby India lat-lon to show pins
+  return [22 + Math.random()*8, 75 + Math.random()*12];
+}
+
+/* ---------- Charts ---------- */
+const candleCtx = document.getElementById('candleChart').getContext('2d');
+let candleChart = new Chart(candleCtx, {
+  type:'bar',
+  data: { labels:['India','USA','UK','Canada','Others'], datasets:[{label:'Candles',data:[0,0,0,0,0], backgroundColor:['#f59e0b','#60a5fa','#93c5fd','#34d399','#a3a3a3']}] },
+  options:{responsive:true,plugins:{legend:{display:false}}}
+});
+
+/* ---------- Render functions ---------- */
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function truncate(s,l){ return s.length>l? s.slice(0,l)+'...': s; }
+
+function renderAll(){
+  // counters
+  candleCountEl.textContent = formatN(JOY.candles.length);
+  statCandles.textContent = formatN(JOY.candles.length);
+  memoryCountEl.textContent = formatN(JOY.memories.length);
+  statMemories.textContent = formatN(JOY.memories.length);
+  tributeCountEl.textContent = formatN(JOY.tributes.length);
+  statTributes.textContent = formatN(JOY.tributes.length);
+
+  // simple candle area (show up to 80)
+  candleArea.innerHTML = '';
+  for(let i=0;i<Math.min(JOY.candles.length,80);i++){ const d = document.createElement('div'); d.className='candle'; candleArea.appendChild(d); }
+
+  // Memory wall: rotate list (first 40)
+  memoryWall.innerHTML = '';
+  const mems = JOY.memories.slice().reverse();
+  if(!mems.length) memoryWall.innerHTML = '<div class="muted">No memories yet — share yours</div>';
+  else {
+    mems.slice(0,50).forEach(m=>{
+      const div = document.createElement('div'); div.style.padding='8px 6px'; div.style.borderBottom='1px solid rgba(0,0,0,0.04)';
+      div.innerHTML = `<div><strong>${escapeHtml(m.name)}</strong> <span class="muted">• ${escapeHtml(m.city || m.institute || '')}</span></div><div style="margin-top:6px">${escapeHtml(truncate(m.text||'',260))}</div>`;
+      memoryWall.appendChild(div);
+    });
+  }
+
+  // tributes gallery
+  const gallery = document.getElementById('tribeGallery'); gallery.innerHTML = '';
+  JOY.tributes.slice().reverse().forEach(t=>{
+    const md = document.createElement('div'); md.className='media-item';
+    if(t.mime && t.mime.startsWith('image/')) {
+      md.innerHTML = `<div style="height:160px;display:flex;align-items:center;justify-content:center"><img src="${t.data}" style="max-width:100%;max-height:150px;border-radius:8px" /></div><div style="margin-top:6px"><strong>${escapeHtml(t.name)}</strong><div class="muted">${escapeHtml(t.city)}</div></div>`;
+    } else if(t.mime && t.mime.startsWith('audio/')) {
+      md.innerHTML = `<div style="height:60px;display:flex;align-items:center;justify-content:center"><audio controls src="${t.data}"></audio></div><div style="margin-top:6px"><strong>${escapeHtml(t.name)}</strong><div class="muted">${escapeHtml(t.city)}</div></div>`;
+    } else {
+      md.innerHTML = `<div><strong>${escapeHtml(t.name)}</strong><div class="muted">${escapeHtml(t.city)}</div></div>`;
+    }
+    gallery.appendChild(md);
+  });
+
+  // map pins
+  renderMapPins();
+
+  // charts & top lists
+  renderCandleChartAndTops();
+  renderTopLists();
+  renderCountryCount();
+  saveData(JOY);
+}
+
+function renderCandleChartAndTops(){
+  // compute counts by country/state/district
+  const countryCounts = {};
+  const stateCounts = {};
+  const districtCounts = {};
+  for(const c of JOY.candles){
+    countryCounts[c.country] = (countryCounts[c.country]||0) + 1;
+    if(c.state) stateCounts[c.state] = (stateCounts[c.state]||0) + 1;
+    if(c.district) districtCounts[c.district] = (districtCounts[c.district]||0) + 1;
+  }
+  // update chart labels/data for top 5 countries
+  const sortedCountries = Object.entries(countryCounts).sort((a,b)=>b[1]-a[1]);
+  const topLabels = sortedCountries.slice(0,5).map(s=>s[0]||'Unknown');
+  const topData = sortedCountries.slice(0,5).map(s=>s[1]);
+  if(topLabels.length===0){ candleChart.data.labels = ['India','USA','UK','Canada','Others']; candleChart.data.datasets[0].data = [0,0,0,0,0]; }
+  else { candleChart.data.labels = topLabels; candleChart.data.datasets[0].data = topData; }
+  candleChart.update();
+
+  // set top state/district/country
+  const topState = Object.entries(stateCounts).sort((a,b)=>b[1]-a[1])[0];
+  topStateEl.textContent = topState ? `${topState[0]} (${topState[1]})` : '—';
+  const topDistrict = Object.entries(districtCounts).sort((a,b)=>b[1]-a[1])[0];
+  topDistrictEl.textContent = topDistrict ? `${topDistrict[0]} (${topDistrict[1]})` : '—';
+  const topCountry = sortedCountries[0];
+  topCountryEl.textContent = topCountry ? `${topCountry[0]} (${topCountry[1]})` : '—';
+}
+
+function renderTopLists(){
+  // top 5 states and top 5 districts for candles
+  const stateCounts = {};
+  const districtCounts = {};
+  for(const c of JOY.candles){ if(c.state) stateCounts[c.state]=(stateCounts[c.state]||0)+1; if(c.district) districtCounts[c.district]=(districtCounts[c.district]||0)+1; }
+  const sortedStates = Object.entries(stateCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const sortedDistricts = Object.entries(districtCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  topStatesList.innerHTML = sortedStates.map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') || '<li class="muted">No data yet</li>';
+  topDistrictsList.innerHTML = sortedDistricts.map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') || '<li class="muted">No data yet</li>';
+}
+
+function renderCountryCount(){
+  const countries = new Set();
+  JOY.memories.forEach(m=> countries.add(m.country || 'India'));
+  JOY.candles.forEach(c=> countries.add(c.country || 'India'));
+  JOY.tributes.forEach(t=> countries.add(t.country || 'India'));
+  countryCountEl.textContent = countries.size;
+}
+
+/* ---------- small auto-rotate memory view (visual) ---------- */
+let memoryScrollInterval = null;
+function startMemoryScroller(){
+  if(memoryScrollInterval) clearInterval(memoryScrollInterval);
+  const total = memoryWall.children.length;
+  let idx = 0;
+  memoryScrollInterval = setInterval(()=>{
+    if(memoryWall.children.length === 0) return;
+    const child = memoryWall.children[idx % memoryWall.children.length];
+    // simple highlight scroll
+    memoryWall.scrollTo({ top: child.offsetTop, behavior:'smooth' });
+    idx++;
+  }, 3500);
+}
+
+/* ---------- helper: escape HTML ---------- */
+
+/* ---------- init: populate countries/selects and render UI ---------- */
+(function init(){
+  // populate candle country dropdown default to India
+  const cSelect = candleCountry;
+  for(const c of COUNTRIES){ const o=document.createElement('option'); o.value=c; o.textContent=c; cSelect.appendChild(o); }
+  cSelect.value = 'India';
+  // memCountry already populated in populateDropdowns() earlier (via initial call)
+  // set memCountry default if dropdown exists
+  try{ document.getElementById('memCountry').value = 'India'; } catch(e){}
+  renderAll();
+  startMemoryScroller();
+})();
+
+/* ---------- event: open/close modals and other UI ---------- */
+document.getElementById('candleCancel').addEventListener('click', ()=> { candleModal.style.display='none'; });
+document.getElementById('memoryCancel').addEventListener('click', ()=> { memoryModal.style.display='none'; });
+document.getElementById('tributeCancel').addEventListener('click', ()=> { tributeModal.style.display='none'; });
+
+/* ---------- top-level open buttons ---------- */
+document.getElementById('openCandleModal').addEventListener('click', ()=> {
+  candleModal.style.display='flex';
+});
+document.getElementById('openMemoryForm').addEventListener('click', ()=> {
+  memoryModal.style.display='flex';
+});
+document.getElementById('openTributeForm').addEventListener('click', ()=> {
+  tributeModal.style.display='flex';
+});
+
+/* ---------- utility: escapeHtml already defined earlier ---------- */
+
+/* ---------- initial rendering called above ---------- */
+
+/* ---------- small accessibility: close modal with ESC ---------- */
+window.addEventListener('keydown', (e)=> { if(e.key==='Escape'){ document.getElementById('candleModal').style.display='none'; document.getElementById('memoryModal').style.display='none'; document.getElementById('tributeModal').style.display='none'; }});
+
+/* ---------- some helpful notes in-console (for admin) ---------- */
+console.log('Joy Zubeen tribute site loaded. Data in localStorage under key:', STORAGE_KEY);
+
+/* ---------- End of script ---------- */
 </script>
 </body>
 </html>
+
