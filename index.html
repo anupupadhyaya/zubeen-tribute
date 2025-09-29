@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Joy — A Tribute to Zubeen Garg</title>
+
+  <!-- Leaflet (map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Simple icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+  <style>
+    /* ---------- Basic layout & branding ---------- */
+    :root{
+      --accent:#ff4f5a;
+      --accent-2:#ff7b54;
+      --bg:#0b0b10;
+      --card:#111118;
+      --muted:#a8a8b3;
+      --glass: rgba(255,255,255,0.03);
+      --max-width:1100px;
+      --font-sans: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background: linear-gradient(180deg,#071023 0%, #0b0b10 60%);
+      color:#e7e7ea;
+      font-family:var(--font-sans);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      padding:20px;
+      display:flex;
+      justify-content:center;
+      box-sizing:border-box;
+    }
+    .wrap{max-width:var(--max-width);width:100%;}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{
+      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));font-weight:700;font-size:20px;
+      box-shadow:0 6px 18px rgba(255,75,90,0.12);
+    }
+    h1{margin:0;font-size:22px}
+    p.lead{margin:6px 0 0;color:var(--muted)}
+
+    /* ---------- grid ---------- */
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
+    @media (max-width:980px){ .grid{grid-template-columns:1fr} .right-col{order:2} }
+
+    /* ---------- card ---------- */
+    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,0.45)}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* ---------- hero media ---------- */
+    .hero-media{display:flex;gap:12px;align-items:center}
+    .hero-media .cover{width:160px;height:160px;border-radius:8px;background:url('https://via.placeholder.com/320x320?text=Zubeen')center/cover}
+    .meta{flex:1}
+    .meta .cta{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .btn{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:white;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+    /* ---------- timeline ---------- */
+    .timeline{display:flex;flex-direction:column;gap:10px}
+    .timeline .item{padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+    .timeline .year{font-weight:700;color:var(--accent)}
+
+    /* ---------- fan hub ---------- */
+    .hub-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    @media (max-width:640px){ .hub-grid{grid-template-columns:1fr} }
+    .tribute-card{background:var(--glass);padding:10px;border-radius:8px;min-height:80px;display:flex;flex-direction:column;gap:8px}
+    .tribute-card img{max-width:100%;border-radius:6px}
+
+    /* ---------- map ---------- */
+    #map{height:330px;border-radius:10px;overflow:hidden}
+
+    /* ---------- form ---------- */
+    form .row{display:flex;gap:8px}
+    form input, form textarea, form select{
+      width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;
+    }
+
+    /* ---------- gallery ---------- */
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media (max-width:800px){ .gallery{grid-template-columns:repeat(2,1fr)} }
+    .gallery .media{background:#0d0d11;padding:6px;border-radius:6px}
+
+    /* ---------- footer ---------- */
+    footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
+
+    /* ---------- small helpers ---------- */
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:8px;align-items:center}
+    .pill{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-size:13px}
+    .share{display:flex;gap:8px}
+    .lang-toggle{display:flex;gap:8px}
+    a{color:var(--accent)}
+    .export-btn{background:transparent;border:1px dashed rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .virtual-candles{display:flex;gap:6px;flex-wrap:wrap}
+    .candle{width:14px;height:36px;border-radius:6px;background:linear-gradient(180deg,#ffdd88,#ffb347);position:relative;box-shadow:0 6px 18px rgba(255,120,40,0.12)}
+    .candle:after{content:'';position:absolute;left:50%;transform:translateX(-50%);top:-8px;width:4px;height:8px;border-radius:6px;background:#ffd;box-shadow:0 6px 18px rgba(255,200,60,0.25)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">JZ</div>
+        <div>
+          <h1>Joy — A Tribute to Zubeen Garg</h1>
+          <p class="lead">A living, fan-curated memorial — memories, music, map, and creative tributes.</p>
+        </div>
+      </div>
+
+      <div style="margin-left:auto" class="lang-toggle">
+        <button class="pill" id="lang-en">EN</button>
+        <button class="pill" id="lang-as">অসমীয়া</button>
+        <button class="pill" id="lang-hi">हिन्दी</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- MAIN COLUMN -->
+      <main>
+        <!-- HERO -->
+        <section class="card hero">
+          <div class="hero-media">
+            <div class="cover" id="hero-cover"></div>
+            <div class="meta">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <h2 id="hero-title">Zubeen Garg — The Voice</h2>
+                  <div class="small muted" id="hero-sub">Singer • Composer • Actor • Activist</div>
+                </div>
+                <div class="row">
+                  <button class="btn" id="light-candle">Light a Candle</button>
+                  <button class="btn ghost" id="export-all">Export Submissions</button>
+                </div>
+              </div>
+
+              <p class="small muted" style="margin-top:10px" id="hero-blurb">
+                This site is a fan-built, living archive and tribute. Add memories, record covers, pin your city to the legacy map, and help build a global mosaic of love.
+              </p>
+
+              <div class="cta small">
+                <button class="pill" id="add-memory-btn">+ Add Memory</button>
+                <button class="pill" id="go-to-map">View Legacy Map</button>
+                <button class="pill" id="go-to-hub">Fan Contributions</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section class="card" style="margin-top:16px">
+          <h3>Life & Milestones</h3>
+          <div class="timeline" id="timeline">
+            <!-- timeline filled by JS -->
+          </div>
+        </section>
+
+        <!-- SONG ARCHIVE -->
+        <section class="card" style="margin-top:16px">
+          <h3>Multimedia Archive — Songs & Videos</h3>
+          <p class="small muted">A curated selection. Click to play or build your own tribute playlist.</p>
+          <div class="gallery" id="media-gallery">
+            <!-- populated by JS -->
+          </div>
+        </section>
+
+        <!-- FAN HUB -->
+        <section class="card" style="margin-top:16px">
+          <h3>Fan Contributions Hub</h3>
+          <p class="small muted">Covers, poems, art and memories shared by fans. You can export your submissions or the entire hub from the top-right button.</p>
+
+          <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+            <button class="btn" id="open-contribute">Contribute Now</button>
+            <button class="export-btn" id="download-json">Download JSON</button>
+            <input id="import-file" type="file" style="display:none" accept=".json">
+            <button class="export-btn" id="import-json-btn">Import Submissions</button>
+          </div>
+
+          <div style="margin-top:12px" id="fan-list">
+            <div class="hub-grid" id="hub-grid">
+              <!-- user tributes here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- FOOTER NOTE -->
+        <footer>
+          <div class="small muted">Designed with ❤️ to celebrate Zubeen's life. No transactions. No commerce. Built to be a living community archive.</div>
+        </footer>
+      </main>
+
+      <!-- RIGHT COLUMN -->
+      <aside class="right-col">
+        <div class="card">
+          <h4>Legacy Map</h4>
+          <p class="small muted">Pin the place connected to your memory (city where you first heard his song, concert you attended, etc.). Export/import pins to help admins collect entries.</p>
+          <div id="map"></div>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <button class="btn" id="add-pin-btn">Add Pin</button>
+            <button class="export-btn" id="export-pins">Export Pins</button>
+            <input id="import-pins-file" type="file" style="display:none" accept=".json">
+            <button class="export-btn" id="import-pins-btn">Import Pins</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h4>Virtual Candles</h4>
+          <p class="small muted">Light a candle to remember. Each visitor can light one (stored locally).</p>
+          <div class="virtual-candles" id="candle-area">
+            <!-- candles added here -->
+          </div>
+          <div style="margin-top:10px" class="small muted">Tip: encourage fans to take a screenshot of their candle and share with #JoyZubeen</div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h4>Share & Spread</h4>
+          <div class="share">
+            <button class="pill" id="share-twitter"><i class="fa-brands fa-x-twitter"></i> Tweet</button>
+            <button class="pill" id="share-fb">Share</button>
+            <button class="pill" id="copy-link">Copy Page Link</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h4>How to Help Build</h4>
+          <ol class="small muted">
+            <li>Contribute a memory or a cover (use "Contribute Now").</li>
+            <li>Export JSON and send to site maintainers for verification & featured display.</li>
+            <li>Organize virtual tribute events and link here (no money, no commerce).</li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ---------- Modal: Add Memory / Contribute ---------- -->
+  <div id="modal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;z-index:9999">
+    <div style="width:100%;max-width:760px;background:linear-gradient(180deg,#0e0e12,#0b0b0f);padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Share Your Tribute</h3>
+        <button id="close-modal" class="pill">Close</button>
+      </div>
+
+      <form id="contribute-form" style="margin-top:12px">
+        <div class="row">
+          <input type="text" id="contrib-name" placeholder="Your name (or anonymous)">
+          <select id="contrib-type">
+            <option value="memory">Memory / Story</option>
+            <option value="cover">Cover / Performance (link)</option>
+            <option value="art">Fan Art / Image Link</option>
+            <option value="poem">Poem / Lyric</option>
+          </select>
+        </div>
+
+        <div style="margin-top:10px">
+          <textarea id="contrib-text" rows="4" placeholder="Write your memory, link to video or image, or paste your poem..."></textarea>
+        </div>
+
+        <div style="margin-top:8px" class="row">
+          <input id="contrib-place" placeholder="City / location (optional)">
+          <input id="contrib-year" placeholder="Year (optional)">
+        </div>
+
+        <div style="margin-top:8px" class="row">
+          <input id="contrib-embed" placeholder="Optional: YouTube link (for playable media)">
+          <button class="btn" type="button" id="submit-contrib">Submit Tribute</button>
+        </div>
+
+        <div id="contrib-msg" style="margin-top:8px;color:var(--muted)"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  /**********************************************
+   * Simple static tribute site JS (client-side only)
+   * - Stores submissions & pins in localStorage
+   * - Allows export/import (JSON)
+   * - Interactive map (Leaflet)
+   * - Simple timeline & media gallery data
+   **********************************************/
+
+  /* ------------------------------
+     Utilities & storage keys
+     ------------------------------ */
+  const STORAGE_KEYS = {
+    SUBMISSIONS: 'joyzubeen_submissions_v1',
+    PINS: 'joyzubeen_pins_v1',
+    CANDLES: 'joyzubeen_candles_v1',
+    LANG: 'joyzubeen_lang_v1'
+  };
+
+  const DEFAULT_TIMELINE = [
+    {year: '1972', text: 'Born — memory placeholder'},
+    {year: '1990', text: 'Early career & breakthrough performances'},
+    {year: '2000', text: 'Regional hits and growing acclaim'},
+    {year: '2010', text: 'Pan-Indian projects and activism'},
+    {year: '2020', text: 'A life celebrated worldwide'}
+  ];
+
+  const START_MEDIA = [
+    {title:'Popular Song — sample', src:'https://www.youtube.com/embed/VIDEO_ID', yt:'https://www.youtube.com/watch?v=VIDEO_ID'},
+    {title:'Live Performance (sample)', src:'https://www.youtube.com/embed/VIDEO_ID2', yt:'https://www.youtube.com/watch?v=VIDEO_ID2'},
+    {title:'Interview Sample', src:'https://www.youtube.com/embed/VIDEO_ID3', yt:'https://www.youtube.com/watch?v=VIDEO_ID3'}
+  ];
+
+  /* ------------------------------
+     Language strings (simple)
+     ------------------------------ */
+  const STRINGS = {
+    en: {
+      title: 'Zubeen Garg — The Voice',
+      blurb: 'This site is a fan-built, living archive and tribute. Add memories, record covers, pin your city to the legacy map, and help build a global mosaic of love.'
+    },
+    as: {
+      title: 'জুবিন গাৰ্গ — স্বৰ',
+      blurb: 'এই ছাইটখন উৎসাহপূৰ্ণ ভক্ত-নির্মিত জীয়াই থকা আর্কাইভ৷ আপোনাৰ স্মৃতি যোগ কৰক, সং গানৰ কভার, মানচিত্ৰত স্থাপন কৰক আৰু এটা বিশ্বজনীন ম'জাইক নিৰ্মাণ কৰক।'
+    },
+    hi: {
+      title: 'ज़ुबिन गर्ग — आवाज़',
+      blurb: 'यह साइट फैंस द्वारा बनाई गई एक जीवंत स्मारक है। अपनी यादें जोड़ें, कवर साझा करें और वैश्विक नक्शे पर अपना स्थान चिह्नित करें।'
+    }
+  };
+
+  /* ------------------------------
+     Init UI
+     ------------------------------ */
+  function el(id){ return document.getElementById(id); }
+
+  function loadFromStorage(key, def){
+    try{
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : def;
+    }catch(e){ return def; }
+  }
+  function saveToStorage(key, obj){
+    localStorage.setItem(key, JSON.stringify(obj));
+  }
+
+  // initial language
+  let LANG = loadFromStorage(STORAGE_KEYS.LANG, 'en');
+  function setLang(l){
+    LANG = l;
+    saveToStorage(STORAGE_KEYS.LANG, LANG);
+    document.getElementById('hero-title').textContent = STRINGS[LANG].title;
+    document.getElementById('hero-blurb').textContent = STRINGS[LANG].blurb;
+  }
+
+  document.getElementById('lang-en').addEventListener('click', ()=>setLang('en'));
+  document.getElementById('lang-as').addEventListener('click', ()=>setLang('as'));
+  document.getElementById('lang-hi').addEventListener('click', ()=>setLang('hi'));
+  setLang(LANG);
+
+  /* ------------------------------
+     Timeline
+     ------------------------------ */
+  function renderTimeline(){
+    const container = el('timeline');
+    container.innerHTML = '';
+    (DEFAULT_TIMELINE || []).forEach(it=>{
+      const d = document.createElement('div');
+      d.className='item';
+      d.innerHTML = `<div class="year">${it.year}</div><div class="small muted">${it.text}</div>`;
+      container.appendChild(d);
+    });
+  }
+  renderTimeline();
+
+  /* ------------------------------
+     Media gallery
+     ------------------------------ */
+  function renderMedia(){
+    const g = el('media-gallery');
+    g.innerHTML = '';
+    START_MEDIA.forEach(m=>{
+      const div = document.createElement('div');
+      div.className='media';
+      const iframe = document.createElement('iframe');
+      iframe.width='100%'; iframe.height='160';
+      iframe.src = m.src;
+      iframe.title = m.title;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.setAttribute('allowfullscreen','');
+      div.appendChild(iframe);
+      const caption = document.createElement('div');
+      caption.className='small muted';
+      caption.style.marginTop='6px';
+      caption.textContent = m.title;
+      div.appendChild(caption);
+      g.appendChild(div);
+    });
+  }
+  renderMedia();
+
+  /* ------------------------------
+     Fan hub: submissions
+     ------------------------------ */
+  let submissions = loadFromStorage(STORAGE_KEYS.SUBMISSIONS, []);
+  function renderSubmissions(){
+    const g = el('hub-grid');
+    g.innerHTML = '';
+    if(!submissions.length){
+      g.innerHTML = `<div class="tribute-card small muted">No tributes yet. Click "Contribute Now" to add the first memory or cover.</div>`;
+      return;
+    }
+    submissions.slice().reverse().forEach((s, idx)=>{
+      const card = document.createElement('div');
+      card.className='tribute-card';
+      const ttop = document.createElement('div');
+      ttop.innerHTML = `<strong>${escapeHtml(s.name || 'Anonymous')}</strong> <span class="small muted">· ${escapeHtml(s.type)} ${s.year?('· '+escapeHtml(s.year)):''}</span>`;
+      card.appendChild(ttop);
+      if(s.embed){
+        const iframe = document.createElement('iframe');
+        iframe.width='100%'; iframe.height='140';
+        iframe.src = convertYoutubeToEmbed(s.embed);
+        iframe.allow='accelerometer; autoplay; encrypted-media; picture-in-picture';
+        card.appendChild(iframe);
+      } else if (s.image){
+        const img = document.createElement('img');
+        img.src = s.image;
+        card.appendChild(img);
+      }
+      const text = document.createElement('div');
+      text.className='small muted';
+      text.style.whiteSpace='pre-wrap';
+      text.textContent = s.text;
+      card.appendChild(text);
+
+      const meta = document.createElement('div');
+      meta.style.display='flex'; meta.style.justifyContent='space-between'; meta.style.marginTop='8px';
+      const share = document.createElement('div');
+      share.className='small muted';
+      share.innerHTML = `${s.place ? escapeHtml(s.place) : ''}`;
+      meta.appendChild(share);
+
+      const actions = document.createElement('div');
+      actions.style.display='flex'; actions.style.gap='6px';
+      const downloadBtn = document.createElement('button');
+      downloadBtn.className='pill';
+      downloadBtn.textContent='Feature';
+      downloadBtn.title='You (as site admin) can mark as Featured later after moderation.';
+      downloadBtn.addEventListener('click', ()=>{ alert('To feature this item: export JSON and add to curated list.'); });
+      actions.appendChild(downloadBtn);
+
+      meta.appendChild(actions);
+      card.appendChild(meta);
+      g.appendChild(card);
+    });
+  }
+
+  renderSubmissions();
+
+  /* ------------------------------
+     Contribute modal
+     ------------------------------ */
+  const modal = el('modal');
+  el('add-memory-btn').addEventListener('click', ()=>openModal());
+  el('open-contribute').addEventListener('click', ()=>openModal());
+  el('close-modal').addEventListener('click', ()=>closeModal());
+  function openModal(){
+    modal.style.display='flex';
+  }
+  function closeModal(){
+    modal.style.display='none';
+  }
+
+  document.getElementById('submit-contrib').addEventListener('click', ()=>{
+    const name = el('contrib-name').value.trim();
+    const type = el('contrib-type').value;
+    const text = el('contrib-text').value.trim();
+    const place = el('contrib-place').value.trim();
+    const year = el('contrib-year').value.trim();
+    const embed = el('contrib-embed').value.trim();
+    if(!text && !embed){ el('contrib-msg').textContent = 'Please add a message, or paste a YouTube link, or image URL.'; return; }
+    const entry = {
+      id: Date.now(),
+      name: name || 'Anonymous',
+      type, text, place, year,
+      embed: embed || null,
+      created_at: new Date().toISOString()
+    };
+    submissions.push(entry);
+    saveToStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
+    el('contrib-msg').textContent = 'Thank you — your tribute is saved in this browser. You can export it to share with admins.';
+    renderSubmissions();
+    setTimeout(()=>{ el('contrib-msg').textContent=''; closeModal(); }, 1200);
+  });
+
+  // simple escape
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function convertYoutubeToEmbed(url){
+    if(!url) return '';
+    const m = url.match(/[?&]v=([^&]+)/);
+    const id = m ? m[1] : (url.includes('youtu.be/') ? url.split('youtu.be/')[1].split(/[?&]/)[0] : '');
+    if(!id) return url;
+    return 'https://www.youtube.com/embed/' + id;
+  }
+
+  /* ------------------------------
+     Export / import submissions
+     ------------------------------ */
+  el('download-json').addEventListener('click', ()=>{
+    const data = JSON.stringify(submissions, null, 2);
+    downloadFile('joyzubeen_submissions.json', data);
+  });
+  el('export-all').addEventListener('click', ()=>{
+    const data = {
+      meta: {site:'joyzubeen-tribute', generated_at: new Date().toISOString()},
+      submissions, pins: loadFromStorage(STORAGE_KEYS.PINS, []), candles: loadFromStorage(STORAGE_KEYS.CANDLES, [])
+    };
+    downloadFile('joyzubeen_export.json', JSON.stringify(data, null, 2));
+  });
+
+  function downloadFile(filename, content){
+    const a = document.createElement('a');
+    const blob = new Blob([content], {type:'application/json'});
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  el('import-json-btn').addEventListener('click', ()=> el('import-file').click());
+  el('import-file').addEventListener('change', (ev)=>{
+    const f = ev.target.files[0]; if(!f) return;
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const parsed = JSON.parse(e.target.result);
+        if(Array.isArray(parsed)) {
+          submissions = submissions.concat(parsed);
+        } else if(parsed.submissions) {
+          submissions = submissions.concat(parsed.submissions);
+        } else {
+          alert('JSON format not recognized. It should be an array of entries or an export object.');
+        }
+        saveToStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
+        renderSubmissions();
+        alert('Imported successfully. Admins should moderate before featuring.');
+      } catch(err){ alert('Invalid JSON'); }
+    };
+    reader.readAsText(f);
+  });
+
+  el('import-pins-btn').addEventListener('click', ()=> el('import-pins-file').click());
+  el('import-pins-file').addEventListener('change', (ev)=>{
+    const f = ev.target.files[0]; if(!f) return;
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const parsed = JSON.parse(e.target.result);
+        if(Array.isArray(parsed)) {
+          pins = pins.concat(parsed);
+        } else if(parsed.pins) {
+          pins = pins.concat(parsed.pins);
+        } else { alert('Pins JSON not recognized.'); return; }
+        savePins();
+        renderPins();
+        alert('Pins imported.');
+      }catch(err){ alert('Invalid JSON'); }
+    };
+    reader.readAsText(f);
+  });
+
+  /* ------------------------------
+     Map (Leaflet)
+     ------------------------------ */
+  let map, pins = loadFromStorage(STORAGE_KEYS.PINS, []);
+  function initMap(){
+    map = L.map('map', {attributionControl:false}).setView([26.1445,91.7362], 6); // NE India default
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19
+    }).addTo(map);
+    renderPins();
+  }
+
+  function renderPins(){
+    // clear layer
+    if(map._pinsLayer) map.removeLayer(map._pinsLayer);
+    const layer = L.layerGroup();
+    (pins || []).forEach(p=>{
+      const marker = L.marker([p.lat,p.lng]).bindPopup(`<strong>${escapeHtml(p.title||'Memory')}</strong><div class="small muted">${escapeHtml(p.text||'')}</div>`);
+      layer.addLayer(marker);
+    });
+    layer.addTo(map);
+    map._pinsLayer = layer;
+  }
+
+  function savePins(){
+    saveToStorage(STORAGE_KEYS.PINS, pins);
+  }
+
+  el('add-pin-btn').addEventListener('click', ()=>{
+    alert('Click on the map to add a pin. After clicking the map, a prompt will ask for title & message.');
+    const onClick = function(e){
+      map.off('click', onClick);
+      const title = prompt('Title of this memory (e.g., "First concert")') || 'Memory';
+      const text = prompt('Short message (optional)') || '';
+      pins.push({id:Date.now(), lat:e.latlng.lat, lng:e.latlng.lng, title, text, created_at:new Date().toISOString()});
+      savePins();
+      renderPins();
+    };
+    map.on('click', onClick);
+  });
+
+  el('export-pins').addEventListener('click', ()=>{
+    downloadFile('joyzubeen_pins.json', JSON.stringify(pins, null, 2));
+  });
+
+  el('import-pins-btn').addEventListener('click', ()=> el('import-pins-file').click());
+
+  /* ------------------------------
+     Virtual candles
+     ------------------------------ */
+  let candles = loadFromStorage(STORAGE_KEYS.CANDLES, []);
+  function renderCandles(){
+    const area = el('candle-area');
+    area.innerHTML = '';
+    if(!candles.length) area.innerHTML = '<div class="small muted">No candles lit yet — be the first.</div>';
+    candles.forEach(c=>{
+      const d = document.createElement('div');
+      d.className='candle';
+      d.title = `${c.name} · ${new Date(c.created_at).toLocaleString()}`;
+      area.appendChild(d);
+    });
+  }
+  el('light-candle').addEventListener('click', ()=>{
+    const me = prompt('Your name to appear with the candle (optional)') || 'Anonymous';
+    candles.push({id:Date.now(), name:me, created_at:new Date().toISOString()});
+    saveToStorage(STORAGE_KEYS.CANDLES, candles);
+    renderCandles();
+  });
+  renderCandles();
+
+  /* ------------------------------
+     Share / social buttons
+     ------------------------------ */
+  el('share-twitter').addEventListener('click', ()=>{
+    const text = encodeURIComponent('Remembering Zubeen Garg — join the tribute at this site. #JoyZubeen');
+    const url = encodeURIComponent(location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  });
+  el('share-fb').addEventListener('click', ()=> {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`, '_blank');
+  });
+  el('copy-link').addEventListener('click', ()=>{
+    navigator.clipboard.writeText(location.href).then(()=> alert('Link copied to clipboard'));
+  });
+
+  /* ------------------------------
+     Export full site data (already implemented above)
+     ------------------------------ */
+
+  /* ------------------------------
+     Misc helpers & init
+     ------------------------------ */
+  // initial map load
+  window.addEventListener('load', ()=>{
+    initMap();
+    renderSubmissions();
+  });
+
+  // simple URL helpers
+  el('go-to-map').addEventListener('click', ()=> { document.querySelector('#map').scrollIntoView({behavior:'smooth'}); });
+  el('go-to-hub').addEventListener('click', ()=> { document.querySelector('#open-contribute').scrollIntoView({behavior:'smooth'}); });
+
+  // small helper: import file input for submissions
+  // already wired above
+
+  // Quick demo content: (only if no submissions yet, add one example)
+  if(!submissions.length){
+    submissions.push({
+      id: 'demo1',
+      name: 'Demo Fan',
+      type: 'memory',
+      text: 'I first heard his voice at my college festival. It changed the way I listened to music.',
+      place: 'Guwahati',
+      year: '2006',
+      created_at: new Date().toISOString()
+    });
+    saveToStorage(STORAGE_KEYS.SUBMISSIONS, submissions);
+    renderSubmissions();
+  }
+
+  </script>
+</body>
+</html>
