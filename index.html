@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Joy Zubeenda — Remembering Zubeen Garg</title>
 
 <!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital@0;1&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -16,201 +16,243 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-  --accent:#ef4444; /* red */
-  --accent-2:#f97316; /* orange */
-  --bg:#fdfdfd;
-  --bg-dark:#111827;
-  --text:#1a1a1a;
-  --text-dark:#f9fafb;
-  --card:#fff;
-  --card-dark:#1f2937;
-}
-body {
-  margin:0;
-  font-family:'Poppins', sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  transition:background .3s,color .3s;
-}
-body.dark{background:var(--bg-dark);color:var(--text-dark);}
-.wrap{max-width:1100px;margin:0 auto;padding:20px;}
-header{text-align:center;margin-bottom:24px}
-.hero h1{font-size:3.2rem;margin:0;font-family:'Merriweather',serif;font-weight:700;color:var(--accent);}
-.hero p{margin:12px 0 0;font-size:1.2rem;font-style:italic;color:#444}
-.card{background:var(--card);padding:20px;border-radius:14px;margin-bottom:24px;
-  border-left:6px solid var(--accent);box-shadow:0 4px 10px rgba(0,0,0,0.05)}
-body.dark .card{background:var(--card-dark);}
-.section-title{font-size:1.5rem;margin-bottom:12px;font-weight:600;color:var(--accent);}
-.counter{font-size:2.3rem;font-weight:700;color:var(--accent-2);}
-button{cursor:pointer;border:none;border-radius:8px;padding:8px 14px;font-size:1rem;font-weight:600}
-.btn{background:var(--accent);color:white}
-.btn.ghost{background:transparent;border:1px solid #ccc;color:inherit}
-.virtual-candles{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.candle{width:16px;height:40px;border-radius:6px;background:linear-gradient(180deg,#ffdd88,#ffb347);position:relative;animation:none}
-.candle.glow{animation:glow 1s ease-in-out infinite alternate}
-.candle:after{content:'';position:absolute;left:50%;transform:translateX(-50%);top:-8px;width:5px;height:10px;border-radius:6px;background:#ffd}
-@keyframes glow{from{box-shadow:0 0 5px 2px orange}to{box-shadow:0 0 15px 5px gold}}
-.memory-wall{height:200px;overflow-y:auto}
-.memory-item{padding:10px;border-bottom:1px solid #ddd}
-label{display:block;margin-top:8px;font-size:0.9rem}
-input,select,textarea{width:100%;padding:8px;margin-top:4px;border-radius:6px;border:1px solid #ccc;font-family:'Poppins',sans-serif}
-#ticker{background:var(--accent);color:white;padding:8px;position:fixed;bottom:0;width:100%;font-size:0.9rem;white-space:nowrap;overflow:hidden}
-#ticker span{display:inline-block;padding-left:100%;animation:ticker 15s linear infinite}
-@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+  :root {
+    --accent:#0b74ff;
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --text:#0b1726;
+    --muted:#667085;
+    --card-shadow:0 6px 22px rgba(10,20,40,0.06);
+    --hero-accent:#ff784f;
+    --max-width:1200px;
+  }
+  body {
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  .dark {
+    --bg:#0b1220;
+    --card:#0f1724;
+    --text:#e6eef8;
+    --muted:#9aa9c3;
+    --card-shadow:0 8px 30px rgba(0,0,0,0.6);
+  }
+  .wrap { max-width:var(--max-width); margin:auto; padding:20px; }
+  header { display:flex; justify-content:space-between; align-items:center; }
+  .hero h1 {
+    font-size:42px;
+    font-family:'Merriweather',serif;
+    margin:0;
+  }
+  .hero .tagline {
+    font-style:italic;
+    color:var(--hero-accent);
+    font-size:18px;
+    margin-top:6px;
+  }
+  .card {
+    background:var(--card);
+    border-radius:12px;
+    padding:16px;
+    box-shadow:var(--card-shadow);
+    margin-top:20px;
+    background-image:linear-gradient(135deg,rgba(11,116,255,0.03),rgba(255,120,79,0.03));
+  }
+  .section-title { font-size:20px; font-weight:600; }
+  button {
+    cursor:pointer;
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    font-weight:600;
+  }
+  .btn-primary { background:var(--accent); color:white; }
+  .btn-ghost { background:transparent; border:1px solid rgba(0,0,0,0.08); }
+  .counter { font-size:32px; font-weight:700; }
+  .candle {
+    width:14px;height:36px;
+    border-radius:6px;
+    background:linear-gradient(180deg,#ffdd88,#ffb347);
+    margin:3px;
+    position:relative;
+  }
+  .candle:after {
+    content:''; position:absolute; top:-8px; left:50%;
+    transform:translateX(-50%);
+    width:4px;height:8px;
+    border-radius:4px;
+    background:white;
+  }
+  .candle.glow {
+    box-shadow:0 0 22px rgba(255,160,30,0.6);
+    transform:translateY(-3px);
+  }
+  .map-container { height:340px; border-radius:12px; overflow:hidden; }
+  .ticker {
+    background:var(--accent); color:white;
+    padding:8px;
+    position:fixed; bottom:0; width:100%;
+    white-space:nowrap; overflow:hidden;
+  }
+  .ticker span {
+    display:inline-block;
+    padding-right:50px;
+    animation:scroll 18s linear infinite;
+  }
+  @keyframes scroll { from{transform:translateX(100%)} to{transform:translateX(-100%)} }
+  /* Quote carousel */
+  .quotes { margin:20px 0; font-style:italic; color:var(--muted); text-align:center; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- Toggle -->
-  <div style="text-align:right;margin-bottom:10px">
-    <button id="mode-toggle" class="btn ghost">🌙 Dark Mode</button>
-  </div>
-
   <!-- Hero -->
-  <header class="hero">
-    <h1>Remembering Zubeen Garg</h1>
-    <p>The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</p>
+  <header>
+    <div class="hero">
+      <h1>Remembering Zubeen Garg</h1>
+      <div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
+    </div>
+    <div>
+      <button id="modeToggle" class="btn-ghost">Toggle Dark</button>
+    </div>
   </header>
 
-  <!-- Virtual Candle -->
-  <section class="card">
-    <h2 class="section-title">🕯️ Light a Virtual Candle</h2>
-    <p>Join fans and light a candle to honor Zubeen's legacy.</p>
-    <div class="counter" id="candle-count">1</div>
-
-    <form id="candle-form">
-      <label>Country</label>
-      <select id="country" required>
-        <option value="India">India</option>
-        <option value="USA">USA</option>
-        <option value="UK">UK</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label>State (if India)</label>
-      <select id="state">
-        <option value="">-- Select State --</option>
-        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
-        <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option>
-        <option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option>
-        <option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
-        <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option>
-        <option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
-        <option>Telangana</option><option>Tripura</option><option>Uttarakhand</option><option>Uttar Pradesh</option>
-        <option>West Bengal</option><option>Andaman and Nicobar Islands</option><option>Chandigarh</option>
-        <option>Dadra and Nagar Haveli and Daman & Diu</option><option>Delhi</option>
-        <option>Jammu & Kashmir</option><option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option>
-      </select>
-
-      <label>District (if Assam)</label>
-      <select id="district">
-        <option value="">-- Select District --</option>
-        <option>Bajali</option><option>Baksa</option><option>Barpeta</option><option>Bongaigaon</option>
-        <option>Cachar</option><option>Charaideo</option><option>Chirang</option><option>Darrang</option>
-        <option>Dhemaji</option><option>Dhubri</option><option>Dibrugarh</option><option>Dima Hasao</option>
-        <option>Goalpara</option><option>Golaghat</option><option>Hailakandi</option><option>Jorhat</option>
-        <option>Kamrup</option><option>Kamrup Metropolitan</option><option>Karbi Anglong</option><option>Karimganj</option>
-        <option>Kokrajhar</option><option>Lakhimpur</option><option>Majuli</option><option>Morigaon</option>
-        <option>Nagaon</option><option>Nalbari</option><option>Sivasagar</option><option>Sonitpur</option>
-        <option>South Salmara-Mankachar</option><option>Tinsukia</option><option>Udalguri</option><option>West Karbi Anglong</option>
-      </select>
-
-      <button type="submit" class="btn" style="margin-top:10px">Light Candle</button>
-    </form>
-
-    <div class="virtual-candles" id="candle-area"></div>
-    <canvas id="candleChart" height="100"></canvas>
+  <!-- Candle Section -->
+  <section class="card" id="candleCard">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="section-title">🕯️ Light a Virtual Candle</div>
+        <div class="muted">Join fans and honor Zubeen’s eternal legacy.</div>
+      </div>
+      <div style="text-align:right">
+        <div class="muted">Candles Lit</div>
+        <div class="counter" id="candleCount">0</div>
+      </div>
+    </div>
+    <div style="margin-top:12px" class="row">
+      <button id="openCandleModal" class="btn-primary">Light Candle</button>
+    </div>
+    <div class="virtual-candles" id="candleArea"></div>
+    <canvas id="candleChart" style="max-height:220px;margin-top:12px"></canvas>
   </section>
 
   <!-- Memory Wall -->
   <section class="card">
-    <h2 class="section-title">🖼️ Share a Memory</h2>
-    <p><span class="counter" id="memory-count">0</span> memories shared</p>
-    <form id="memory-form">
-      <label>Name</label><input name="name" required>
-      <label>Email</label><input name="email" type="email" required>
-      <label>City / Institute</label><input name="city">
-      <label>Country</label>
-      <select id="mem-country" name="country"><option value="India">India</option><option>USA</option><option>UK</option><option>Other</option></select>
-      <label>State (if India)</label><select id="mem-state" name="state"><option value="">-- Select State --</option><option>Assam</option><option>Bihar</option><option>Delhi</option></select>
-      <label>District (if Assam)</label><select id="mem-district" name="district"><option value="">-- Select District --</option><option>Dibrugarh</option><option>Jorhat</option><option>Kamrup</option></select>
-      <label>Your Story</label><textarea name="story" required></textarea>
-      <label>Photo/Video Link</label><input name="link" placeholder="YouTube / Instagram link">
-      <button type="submit" class="btn" style="margin-top:10px">Submit Memory</button>
-    </form>
-    <div class="memory-wall" id="memory-wall"></div>
+    <div class="section-title">🖼️ Interactive Memory Wall</div>
+    <div class="muted"><span id="memoryCount">0</span> memories shared</div>
+    <button id="openMemoryForm" class="btn-primary" style="margin-top:10px">Share a Memory</button>
+    <div id="memoryWall" style="margin-top:12px;max-height:180px;overflow-y:auto;"></div>
   </section>
 
-  <!-- Fan Tributes -->
+  <!-- Tributes -->
   <section class="card">
-    <h2 class="section-title">🎶 Fan Tributes Hub</h2>
-    <p><span class="counter" id="tribute-count">0</span> tributes featured</p>
-    <form id="tribute-form">
-      <label>Name</label><input name="name" required>
-      <label>Type</label>
-      <select name="type"><option>Song Cover</option><option>Poem</option><option>Artwork</option><option>Video</option></select>
-      <label>Link</label><input name="link" placeholder="YouTube / Instagram link" required>
-      <button type="submit" class="btn" style="margin-top:10px">Submit Tribute</button>
-    </form>
-    <div id="tribute-list"></div>
+    <div class="section-title">🎶 Fan Tributes Hub</div>
+    <div class="muted"><span id="tributeCount">0</span> tributes featured</div>
+    <button id="openTributeForm" class="btn-primary" style="margin-top:10px">Share a Tribute</button>
+    <div id="tributeWall" style="margin-top:12px;max-height:180px;overflow-y:auto;"></div>
   </section>
 
   <!-- Global Map -->
   <section class="card">
-    <h2 class="section-title">🌍 Global Legacy Map</h2>
-    <p><span class="counter" id="map-count">0</span> countries represented</p>
-    <div id="map" style="height:300px;border-radius:8px"></div>
+    <div class="section-title">🌍 Global Legacy Map</div>
+    <div class="map-container" id="map"></div>
   </section>
 
   <!-- Timeline -->
   <section class="card">
-    <h2 class="section-title">📜 Zubeen Garg's Journey</h2>
-    <ul>
-      <li>1972 — Born in Tura, Meghalaya</li>
-      <li>1992 — First Assamese album released</li>
-      <li>2006 — “Ya Ali” became a nationwide sensation</li>
-      <li>2010s — Advocated for equality and humanity</li>
-      <li>2025 — Forever in our hearts</li>
-    </ul>
+    <div class="section-title">📜 Timeline & Beliefs</div>
+    <p><strong>1972</strong> — Born, early love for music.</p>
+    <p><strong>2000s</strong> — Multilingual artist, 40+ languages.</p>
+    <p><strong>2010s</strong> — Activism, equality, compassion.</p>
+    <p><strong>Legacy</strong> — A voice that lives forever.</p>
   </section>
 
-  <!-- Future Merchandise Placeholder -->
-  <!-- <section class="card"><h2 class="section-title">🛒 Merchandise (Coming Soon)</h2></section> -->
+  <!-- Quotes -->
+  <section class="card quotes">
+    <div id="quoteCarousel">“Music is not bound by borders.”</div>
+  </section>
+
+  <!-- Merchandise Placeholder -->
+  <!-- <section class="card">🛍️ Merchandise coming soon</section> -->
 
 </div>
 
-<!-- Live Ticker -->
-<div id="ticker"><span id="ticker-text">Latest: Candle lit from Guwahati, Assam</span></div>
+<!-- Ticker -->
+<div class="ticker"><span id="tickerText">Latest candles lit will appear here...</span></div>
 
 <script>
-// Toggle
-const modeBtn=document.getElementById("mode-toggle");
-modeBtn.onclick=()=>{document.body.classList.toggle("dark");modeBtn.textContent=document.body.classList.contains("dark")?"☀️ Light Mode":"🌙 Dark Mode";};
+// Mode toggle
+document.getElementById('modeToggle').onclick=()=>{
+  document.body.classList.toggle('dark');
+};
 
-// Candle
-let candleCount=1;const ticker=document.getElementById("ticker-text");
-function renderCandles(){const area=document.getElementById("candle-area");area.innerHTML="";for(let i=0;i<Math.min(candleCount,50);i++){const c=document.createElement("div");c.className="candle glow";area.appendChild(c);} }
-renderCandles();
-document.getElementById("candle-form").onsubmit=(e)=>{e.preventDefault();if(localStorage.getItem("litCandle")){alert("You have already lit a candle.");return;}candleCount++;localStorage.setItem("litCandle","yes");document.getElementById("candle-count").textContent=candleCount;renderCandles();ticker.textContent="Latest: Candle lit from "+document.getElementById("country").value;};
+// Dummy data handling
+let candles=[],memories=[],tributes=[];
+const candleCountEl=document.getElementById('candleCount');
+const candleArea=document.getElementById('candleArea');
+const ticker=document.getElementById('tickerText');
 
-// Chart
-const ctx=document.getElementById("candleChart");
-const candleChart=new Chart(ctx,{type:"bar",data:{labels:["Assam","Other India","USA","UK","Others"],datasets:[{data:[1,0,0,0,0],backgroundColor:["#f59e0b","#3b82f6","#10b981","#ef4444","#6b7280"]}]}});
+// Light candle
+document.getElementById('openCandleModal').onclick=()=>{
+  const entry={id:Date.now(),country:"India",state:"Assam",district:"Guwahati"};
+  candles.push(entry);
+  render();
+  // glowing candle
+  const el=document.createElement('div');el.className="candle glow";candleArea.prepend(el);
+  setTimeout(()=>el.classList.remove('glow'),2000);
+  ticker.textContent="Latest candles lit from Guwahati, Assam, India";
+};
 
-// Memories
-let memories=[];document.getElementById("memory-form").onsubmit=(e)=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target).entries());memories.push(d);document.getElementById("memory-count").textContent=memories.length;renderMemory();e.target.reset();};
-function renderMemory(){document.getElementById("memory-wall").innerHTML=memories.map(m=>`<div class='memory-item'><em>“${m.story}”</em><br>— ${m.name}, ${m.city||""} ${m.country||""}</div>`).join("");}
+// Memory
+document.getElementById('openMemoryForm').onclick=()=>{
+  const entry={id:Date.now(),text:"Zubeen’s songs healed my soul.",name:"Fan"};
+  memories.push(entry);
+  render();
+};
 
-// Tributes
-let tributes=[];document.getElementById("tribute-form").onsubmit=(e)=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target).entries());tributes.push(d);document.getElementById("tribute-count").textContent=tributes.length;renderTributes();e.target.reset();};
-function renderTributes(){document.getElementById("tribute-list").innerHTML=tributes.map(t=>`<p>${t.type}: <a href='${t.link}' target='_blank'>${t.link}</a> — ${t.name}</p>`).join("");}
+// Tribute
+document.getElementById('openTributeForm').onclick=()=>{
+  const entry={id:Date.now(),text:"Shared my cover of his classic.",name:"Singer"};
+  tributes.push(entry);
+  render();
+};
 
-// Map
-const map=L.map('map').setView([26.1,91.7],2);
+function render(){
+  candleCountEl.textContent=candles.length;
+  candleArea.innerHTML="";
+  candles.slice(-20).forEach(()=>{let d=document.createElement('div');d.className="candle";candleArea.appendChild(d);});
+  document.getElementById('memoryCount').textContent=memories.length;
+  document.getElementById('memoryWall').innerHTML=memories.map(m=>`<p><strong>${m.name}</strong>: ${m.text}</p>`).join("");
+  document.getElementById('tributeCount').textContent=tributes.length;
+  document.getElementById('tributeWall').innerHTML=tributes.map(t=>`<p><strong>${t.name}</strong>: ${t.text}</p>`).join("");
+  candleChart.data.datasets[0].data=[candles.length,Math.floor(candles.length/2),2,1];
+  candleChart.update();
+}
+
+// Chart.js
+const ctx=document.getElementById('candleChart').getContext('2d');
+const candleChart=new Chart(ctx,{
+  type:'bar',
+  data:{labels:["India","States","Districts","Countries"],datasets:[{data:[0,0,0,0],backgroundColor:["#f59e0b","#60a5fa","#34d399","#a3a3a3"]}]},
+  options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+
+// Leaflet Map
+const map=L.map('map').setView([26.14,91.79],4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-L.marker([26.1,91.7]).addTo(map).bindPopup("Assam, India");
+
+// Quotes rotation
+const quotes=[
+ "“Music is not bound by borders.”",
+ "“Equality is the true rhythm of life.”",
+ "“Zubeen-da lives in every note.”"
+];
+let qi=0;setInterval(()=>{qi=(qi+1)%quotes.length;document.getElementById('quoteCarousel').textContent=quotes[qi];},4000);
+
+render();
 </script>
 </body>
 </html>
