@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Joy Zubeenda — Remembering Zubeen Garg</title>
+<title>#JoyZubeenDa : Remembering Zubeen Da's Legacy</title>
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -92,7 +92,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
     <div class="brand">
       <div class="logo">JZ</div>
       <div class="hero-text">
-        <h1>Remembering Zubeen Garg</h1>
+        <h1>Remembering Zubeen Da</h1>
         <div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
       </div>
     </div>
@@ -113,7 +113,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <div class="section-title">🕯️ Light a Virtual Candle</div>
-            <div class="muted">Join fans across the world to honor Zubeen's legacy.</div>
+            <div class="muted">Join fans across the world to honor Zubeen Da's legacy.</div>
           </div>
           <div style="text-align:right">
             <div class="muted">Total Candles Lit</div>
@@ -123,7 +123,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 
         <div style="margin-top:12px" class="row">
           <button id="openCandleModal2" class="btn-primary">Light Your Candle</button>
-          <div class="hint" style="margin-left:8px">Only one candle per browser (localStorage)</div>
+          <div class="hint" style="margin-left:8px"></div>
         </div>
 
         <div class="virtual-candles" id="candleArea" aria-hidden="true" style="min-height:60px"></div>
@@ -161,10 +161,10 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
         <div class="section-title">📜 Timeline & Beliefs</div>
         <div style="display:flex;gap:12px;align-items:flex-start">
           <div style="flex:1">
-            <p><strong>1972</strong> — Born. Early musical interest.</p>
-            <p><strong>2000s</strong> — Became a multi-lingual recording artist, singing in 40+ languages.</p>
-            <p><strong>2010s</strong> — Social activism & animal rights. Treated everyone equally; championed cultural pride.</p>
-            <p><strong>Legacy</strong> — A powerful voice across India & abroad; celebrated by fans worldwide.</p>
+            <p><strong>1972</strong> : Born. Early musical interest.</p>
+            <p><strong>2000s</strong> : Became a multi-lingual recording artist, singing in 40+ languages.</p>
+            <p><strong>2010s</strong> : Social activism & animal rights. Championed cultural pride.</p>
+            <p><strong>Legacy</strong> : A powerful voice across India & abroad; celebrated by fans worldwide.</p>
           </div>
           <div style="width:240px">
             <div class="card small"><div class="small muted">Notable</div><div style="margin-top:6px"><strong>40+</strong> languages</div><div><strong>38,000+</strong> songs</div></div>
@@ -206,7 +206,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
   </div>
 
   <div class="footer">
-    Built with ❤️ for Zubeen-da. This is a non-commercial, shared tribute.
+    Built with ❤️ for Zubeen-Da. This is a non-commercial, shared tribute.
     <div class="footer-links"><button id="openContactModalBtn">Contact Me</button></div>
   </div>
 </div>
@@ -581,7 +581,7 @@ db.collection("memories").orderBy("ts","desc").onSnapshot(snapshot => {
 document.getElementById('candleSubmit').onclick = async () => {
   const candleMsg = document.getElementById('candleMsg');
   if (localStorage.getItem('JOY_CANDLE_LIT')) {
-    candleMsg.textContent = 'Thank you — you have already lit a candle from this browser.';
+    candleMsg.textContent = 'Thank you : You have already lit a candle, Cheers!.';
     return;
   }
   const btn = document.getElementById('candleSubmit');
@@ -606,7 +606,7 @@ document.getElementById('candleSubmit').onclick = async () => {
     area.insertBefore(newC, area.firstChild);
 
     document.getElementById('candleModal').style.display = 'none';
-    document.getElementById('candleMsg').textContent = 'Thank you — candle lit!';
+    document.getElementById('candleMsg').textContent = 'Thank you : candle lit!';
   } catch(err){
     console.error('Error adding candle:', err);
     candleMsg.textContent = 'An error occurred. Please try again.';
@@ -639,7 +639,7 @@ document.getElementById('memoryForm').addEventListener('submit', async (ev) => {
 
   try {
     await db.collection("memories").add(obj);
-    memoryMsg.textContent = 'Memory submitted — thank you!';
+    memoryMsg.textContent = 'Memory submitted : thank you!';
     ev.target.reset();
     document.getElementById('memoryModal').style.display = 'none';
   } catch(err){
@@ -786,3 +786,4 @@ init();
 </script>
 </body>
 </html>
+
