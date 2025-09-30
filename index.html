@@ -1,272 +1,788 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Candlelight Tribute Map</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #fdf6e3;
-    }
-    #map {
-      height: 500px;
-      width: 100%;
-    }
-    .controls {
-      text-align: center;
-      margin: 15px;
-    }
-    button {
-      padding: 10px 15px;
-      margin: 5px;
-      background: #ff9933;
-      border: none;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #cc7a29;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-    }
-    .modal h2 {
-      margin-top: 0;
-    }
-    input, textarea, select {
-      width: 100%;
-      margin: 8px 0;
-      padding: 8px;
-    }
-    .close {
-      float: right;
-      font-size: 18px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Joy Zubeenda — Remembering Zubeen Garg</title>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Firebase (v8 compat as used in your original code) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<!-- EmailJS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<style>
+:root{
+  --accent:#0b74ff; --bg:#f6f7fb; --card:#ffffff; --text:#0b1726;
+  --muted:#556; --glass:rgba(11,23,38,0.03); --card-shadow:0 6px 22px rgba(10,20,40,0.06);
+  --max-width:1200px;
+}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+.dark{--bg:#0b1220;--card:#0f1724;--text:#e6eef8;--muted:#9aa9c3;--glass:rgba(255,255,255,0.03);--card-shadow:0 8px 30px rgba(0,0,0,0.6)}
+.wrap{max-width:var(--max-width);margin:12px auto;padding:12px}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#66a6ff);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px;box-shadow:var(--card-shadow)}
+.hero-text{max-width:720px}
+h1{font-size:28px;margin:0;line-height:1.1}
+.tagline{margin-top:6px;color:var(--muted);font-size:14px}
+.controls{display:flex;gap:8px;align-items:center}
+button{cursor:pointer;padding:8px 12px;border-radius:8px;border:0;font-size:14px}
+.btn-primary{background:var(--accent);color:white;box-shadow:0 6px 20px rgba(11,116,255,0.12)}
+.btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text)}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:12px}@media (max-width:980px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--card-shadow)}
+.section-title{font-size:16px;margin:0 0 8px 0}
+.muted{color:var(--muted);font-size:13px}
+.counter{font-size:34px;font-weight:700;margin-top:6px}
+.virtual-candles{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.candle{width:14px;height:36px;border-radius:6px;background:linear-gradient(180deg,#ffdd88,#ffb347);position:relative;box-shadow:0 6px 12px rgba(255,120,20,0.12);transform-origin:center bottom}
+.candle:after{content:'';position:absolute;left:50%;transform:translateX(-50%);top:-8px;width:6px;height:10px;border-radius:6px;background:#fff;filter:drop-shadow(0 6px 12px rgba(255,200,60,0.25))}
+.candle.glow{box-shadow:0 10px 40px rgba(255,140,40,0.35), 0 0 28px rgba(255,160,30,0.18);transform:translateY(-3px)}
+.candle .flame{position:absolute;left:50%;transform:translateX(-50%);top:-18px;width:10px;height:14px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background: radial-gradient(circle at 30% 30%, #fff7b6 0 30%, #ffd24d 40%, #ff7a00 70%);opacity:0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(255,160,50,0.4))}
+.candle.lit .flame{animation:flameFlicker 900ms infinite;opacity:1}
+@keyframes flameFlicker{
+  0%{transform:translateX(-50%) scale(0.9) translateY(-1px)}
+  50%{transform:translateX(-50%) scale(1.05) translateY(-4px)}
+  100%{transform:translateX(-50%) scale(0.95) translateY(-2px)}
+}
+.small{font-size:13px}
+.row{display:flex;gap:8px;align-items:center}
+input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid rgba(10,20,30,0.06);font-size:14px;background:white}
+select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
+.footer{margin-top:12px;text-align:center;color:var(--muted)}
+.footer-links{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.footer-links button{background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;padding:0}
+.top-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.stat{background:rgba(0,0,0,0.03);padding:10px;border-radius:8px;text-align:center;min-width:120px}
+.map-container{height:360px;border-radius:8px;overflow:hidden}
+.pill{background:rgba(0,0,0,0.03);padding:6px 10px;border-radius:999px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.memory-embed{margin-top:10px;max-width:100%;border-radius:8px}
+.memory-embed iframe{width:100%;height:220px;border:0;border-radius:8px}
+.memory-embed img{max-width:100%;height:auto;border-radius:8px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;padding:14px;z-index:9999}
+.modal-card{width:100%;max-width:880px;background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--card-shadow)}
+.modal .row{flex-wrap:wrap}
+.modal .close{background:none;border:0;font-size:18px;cursor:pointer}
+.memory-item{padding:8px;border-bottom:1px solid var(--glass)}
+.memory-rotator{height:220px;overflow:hidden;position:relative}
+.memory-rotator .slide{position:absolute;left:0;right:0;top:0;bottom:0;opacity:0;transition:opacity .6s, transform .6s;transform:translateY(6px)}
+.memory-rotator .slide.active{opacity:1;transform:translateY(0)}
+/* make mode toggle compact on small screens */
+@media (max-width:480px){
+  header{padding:8px}
+  .controls{order:2;margin-top:8px}
+  .logo{width:56px;height:56px}
+  h1{font-size:20px}
+}
+</style>
 </head>
 <body>
-
-  <h1 style="text-align:center;">🕯️ Candlelight Tribute Map of India</h1>
-  <div class="controls">
-    <button id="openCandleModal">Light a Candle</button>
-    <button id="openMemoryForm">Share a Memory</button>
-    <button id="openContactModalBtn">Contact Us</button>
-  </div>
-  <div id="map"></div>
-
-  <!-- Candle Modal -->
-  <div id="candleModal" class="modal">
-    <div class="modal-content">
-      <span id="candleCancel" class="close">&times;</span>
-      <h2>Light a Candle</h2>
-      <form id="candleForm">
-        <input type="text" id="candleName" placeholder="Your Name" required>
-        <select id="candleState" required>
-          <option value="">Select State</option>
-          <option>Andhra Pradesh</option>
-          <option>Arunachal Pradesh</option>
-          <option>Assam</option>
-          <option>Bihar</option>
-          <option>Chhattisgarh</option>
-          <option>Goa</option>
-          <option>Gujarat</option>
-          <option>Haryana</option>
-          <option>Himachal Pradesh</option>
-          <option>Jharkhand</option>
-          <option>Karnataka</option>
-          <option>Kerala</option>
-          <option>Madhya Pradesh</option>
-          <option>Maharashtra</option>
-          <option>Manipur</option>
-          <option>Meghalaya</option>
-          <option>Mizoram</option>
-          <option>Nagaland</option>
-          <option>Odisha</option>
-          <option>Punjab</option>
-          <option>Rajasthan</option>
-          <option>Sikkim</option>
-          <option>Tamil Nadu</option>
-          <option>Telangana</option>
-          <option>Tripura</option>
-          <option>Uttar Pradesh</option>
-          <option>Uttarakhand</option>
-          <option>West Bengal</option>
-          <option>Delhi</option>
-          <option>Jammu and Kashmir</option>
-          <option>Ladakh</option>
-          <option>Puducherry</option>
-        </select>
-        <button type="submit">Submit</button>
-      </form>
+<div class="wrap" id="pageWrap">
+  <header>
+    <div class="brand">
+      <div class="logo">JZ</div>
+      <div class="hero-text">
+        <h1>Remembering Zubeen Garg</h1>
+        <div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Memory Modal -->
-  <div id="memoryModal" class="modal">
-    <div class="modal-content">
-      <span id="memoryCancel" class="close">&times;</span>
-      <h2>Share a Memory</h2>
-      <form id="memoryForm">
-        <input type="text" id="memoryName" placeholder="Your Name" required>
-        <textarea id="memoryMessage" placeholder="Write your memory..." rows="4" required></textarea>
-        <button type="submit">Submit</button>
-      </form>
+    <!-- Right side controls (keeps compact on mobile) -->
+    <div class="controls" id="headerControls">
+      <div class="pill small" id="modeLabel">Light Mode</div>
+      <button id="modeToggle" class="btn-ghost">Switch</button>
+      <button id="openCandleModal" class="btn-primary">Light Your Candle</button>
+      <button id="openMemoryForm" class="btn-primary">Share a Memory</button>
     </div>
+  </header>
+
+  <div class="grid">
+    <main>
+      <!-- Candle card -->
+      <section class="card" id="candleCard">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="section-title">🕯️ Light a Virtual Candle</div>
+            <div class="muted">Join fans across the world to honor Zubeen's legacy.</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">Total Candles Lit</div>
+            <div class="counter" id="candleCount">0</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="row">
+          <button id="openCandleModal2" class="btn-primary">Light Your Candle</button>
+          <div class="hint" style="margin-left:8px">Only one candle per browser (localStorage)</div>
+        </div>
+
+        <div class="virtual-candles" id="candleArea" aria-hidden="true" style="min-height:60px"></div>
+
+        <div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div style="max-width:320px;"><canvas id="candleChart" style="height:180px"></canvas></div>
+          <div style="flex:1; min-width:240px;">
+            <div class="top-stats">
+              <div class="stat"><small>Top State</small><strong id="topState">—</strong></div>
+              <div class="stat"><small>Top District (Assam)</small><strong id="topDistrict">—</strong></div>
+              <div class="stat"><small>Top Country</small><strong id="topCountry">—</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Memory wall -->
+      <section class="card" id="memoryCard" style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="section-title">🖼️ Global Memory Wall</div>
+            <div class="muted"><span id="memoryCount">0</span> memories shared</div>
+          </div>
+          <div><button id="openMemoryForm2" class="btn-primary">Share a Memory</button></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div id="memoryWall" class="memory-rotator">
+            <!-- slides populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <div class="section-title">📜 Timeline & Beliefs</div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:1">
+            <p><strong>1972</strong> — Born. Early musical interest.</p>
+            <p><strong>2000s</strong> — Became a multi-lingual recording artist, singing in 40+ languages.</p>
+            <p><strong>2010s</strong> — Social activism & animal rights. Treated everyone equally; championed cultural pride.</p>
+            <p><strong>Legacy</strong> — A powerful voice across India & abroad; celebrated by fans worldwide.</p>
+          </div>
+          <div style="width:240px">
+            <div class="card small"><div class="small muted">Notable</div><div style="margin-top:6px"><strong>40+</strong> languages</div><div><strong>38,000+</strong> songs</div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <div class="card map-card">
+        <div class="section-title">🌍 Global Legacy Map</div>
+        <div class="muted">Pins from memories & candles. Countries represented: <strong id="countryCount">0</strong></div>
+        <div class="map-container" id="map"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="section-title">Live Stats</div>
+        <div class="stat" style="text-align:left; min-width: 0;"><small>Total Candles</small><strong id="statCandles">0</strong></div>
+        <div style="height:10px"></div>
+        <div class="stat" style="text-align:left; min-width: 0;"><small>Total Memories</small><strong id="statMemories">0</strong></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="section-title">Top Regions</div>
+        <div class="muted">Top 5 states (candles)</div><ol id="topStatesList"></ol>
+        <div class="muted">Top Assam districts</div><ol id="topDistrictsList"></ol>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="section-title">💡 Suggestions</div>
+        <form id="suggestionForm">
+          <textarea name="suggestion" rows="4" placeholder="Have a suggestion to improve this site?" required></textarea>
+          <button type="submit" class="btn-primary" style="width:100%; margin-top:8px;">Send Suggestion</button>
+          <div id="suggestionMsg" class="hint">Your feedback is appreciated!</div>
+        </form>
+      </div>
+
+    </aside>
   </div>
 
-  <!-- Contact Modal -->
-  <div id="contactModal" class="modal">
-    <div class="modal-content">
-      <span id="contactCancel" class="close">&times;</span>
-      <h2>Contact Us</h2>
-      <form id="contactForm">
-        <input type="text" id="contactName" placeholder="Your Name" required>
-        <input type="email" id="contactEmail" placeholder="Your Email" required>
-        <textarea id="contactMessage" placeholder="Your Message" rows="4" required></textarea>
-        <button type="submit">Send</button>
-      </form>
+  <div class="footer">
+    Built with ❤️ for Zubeen-da. This is a non-commercial, shared tribute.
+    <div class="footer-links"><button id="openContactModalBtn">Contact Me</button></div>
+  </div>
+</div>
+
+<!-- Candle Modal -->
+<div id="candleModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="candleTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 id="candleTitle" style="margin:0">Light a Candle</h3>
+      <button class="close" id="candleCloseBtn">&times;</button>
     </div>
+    <div class="muted">Choose your location and light a virtual candle. You can light only once per browser session.</div>
+
+    <div style="margin-top:12px">
+      <label class="small">Name (optional)</label><input id="candleName" placeholder="Your name (or leave blank)" />
+    </div>
+
+    <div style="margin-top:8px" class="row">
+      <div style="flex:1">
+        <label class="small">Country</label>
+        <select id="candleCountry"></select>
+      </div>
+      <div style="flex:1">
+        <label class="small">State (India only)</label>
+        <select id="candleState"></select>
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label class="small">District (Assam only)</label>
+      <select id="candleDistrict"></select>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+      <button type="button" id="candleCancel" class="btn-ghost">Cancel</button>
+      <button id="candleSubmit" class="btn-primary">Light Candle</button>
+    </div>
+    <div id="candleMsg" class="muted" style="margin-top:8px"></div>
   </div>
+</div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<!-- Memory Modal -->
+<div id="memoryModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="memoryTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 id="memoryTitle" style="margin:0">Share a Memory</h3>
+      <button class="close" id="memoryCloseBtn">&times;</button>
+    </div>
+    <div class="muted">Your submission will be shown on the Memory Wall and map.</div>
 
-  <script>
-    // ---------- 1. FIREBASE CONFIG ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyB-REPLACE_WITH_REAL",
-      authDomain: "yourproject.firebaseapp.com",
-      databaseURL: "https://yourproject-default-rtdb.firebaseio.com",
-      projectId: "yourproject",
-      storageBucket: "yourproject.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    <form id="memoryForm" style="margin-top:12px;display:grid;gap:8px">
+      <div style="display:flex;gap:8px"><input name="name" placeholder="Your name (or anonymous)" /><input name="email" placeholder="Email (optional, not displayed)" /></div>
+      <div style="display:flex;gap:8px"><input name="city" placeholder="City / Town" /><input name="institute" placeholder="Institute / Profession" /></div>
+      <div style="display:flex;gap:8px"><select name="country" id="memCountry"></select><select name="state" id="memState"></select></div>
+      <div><textarea name="text" rows="4" placeholder="Write your memory here. You can also paste a YouTube or image URL."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button type="button" id="memoryCancelBtn" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Submit Memory</button>
+      </div>
+      <div id="memoryMsg" class="muted"></div>
+    </form>
+  </div>
+</div>
 
-    // ---------- 2. EMAILJS CONFIG ----------
-    (function(){
-      emailjs.init("YOUR_EMAILJS_USER_ID");
-    })();
+<!-- Contact Modal -->
+<div id="contactModal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 id="contactTitle" style="margin:0">Contact Me</h3>
+      <button class="close" id="contactCloseBtn">&times;</button>
+    </div>
+    <form id="contactForm" style="margin-top:12px;display:grid;gap:8px">
+      <input name="contact_name" placeholder="Your Name" required />
+      <input name="contact_email" type="email" placeholder="Your Email" required />
+      <input name="contact_mobile" placeholder="Your Mobile Number (Optional)" />
+      <textarea name="contact_message" rows="4" placeholder="Your Message" required></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button type="button" id="contactCancel" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Send Message</button>
+      </div>
+      <div id="contactMsg" class="hint" style="text-align: right;"></div>
+    </form>
+  </div>
+</div>
 
-    // ---------- 3. MAP ----------
-    const map = L.map('map').setView([22.9734, 78.6569], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+<script>
+// =================================================================================
+// COMPLETE SCRIPT (Firebase Firestore + EmailJS + Map + Chart + UI)
+// =================================================================================
 
-    const STATE_COORDS = {
-      "Andhra Pradesh": [15.9129, 79.7400],
-      "Arunachal Pradesh": [28.2180, 94.7278],
-      "Assam": [26.2006, 92.9376],
-      "Bihar": [25.0961, 85.3131],
-      "Chhattisgarh": [21.2787, 81.8661],
-      "Goa": [15.2993, 74.1240],
-      "Gujarat": [22.2587, 71.1924],
-      "Haryana": [29.0588, 76.0856],
-      "Himachal Pradesh": [31.1048, 77.1734],
-      "Jharkhand": [23.6102, 85.2799],
-      "Karnataka": [15.3173, 75.7139],
-      "Kerala": [10.8505, 76.2711],
-      "Madhya Pradesh": [22.9734, 78.6569],
-      "Maharashtra": [19.7515, 75.7139],
-      "Manipur": [24.6637, 93.9063],
-      "Meghalaya": [25.4670, 91.3662],
-      "Mizoram": [23.1645, 92.9376],
-      "Nagaland": [26.1584, 94.5624],
-      "Odisha": [20.9517, 85.0985],
-      "Punjab": [31.1471, 75.3412],
-      "Rajasthan": [27.0238, 74.2179],
-      "Sikkim": [27.5330, 88.5122],
-      "Tamil Nadu": [11.1271, 78.6569],
-      "Telangana": [17.1232, 79.2088],
-      "Tripura": [23.9408, 91.9882],
-      "Uttar Pradesh": [26.8467, 80.9462],
-      "Uttarakhand": [30.0668, 79.0193],
-      "West Bengal": [22.9868, 87.8550],
-      "Delhi": [28.7041, 77.1025],
-      "Jammu and Kashmir": [33.7782, 76.5762],
-      "Ladakh": [34.1526, 77.5770],
-      "Puducherry": [11.9416, 79.8083]
-    };
+// ---------- 1. FIREBASE CONFIG (from your original code) ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyAMu6Tddmn8ha4U-c1GnfKH3SGEdOOxNAU",
+  authDomain: "zubeen-da-tribute.firebaseapp.com",
+  projectId: "zubeen-da-tribute",
+  storageBucket: "zubeen-da-tribute.firebasestorage.app",
+  messagingSenderId: "1042239604011",
+  appId: "1:1042239604011:web:dc5a21816c38d67ce3b16e",
+  measurementId: "G-WTGYWBD88D"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    // ---------- 4. MODALS ----------
-    function openModal(id) {
-      document.getElementById(id).style.display = "flex";
+// ---------- 2. EMAILJS CONFIG (from your original code) ----------
+const EMAILJS_PUBLIC_KEY = "_0aDRZ63IQ2E-2Dzk";
+const EMAILJS_SERVICE_ID = "service_qkbh7r8";
+const EMAILJS_TEMPLATE_CONTACT = "template_6q94z4d";
+const EMAILJS_TEMPLATE_SUGGESTION = "template_21pqjmq";
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ---------- 3. GLOBALS & DATA LISTS ----------
+let ALL_CANDLES = [];
+let ALL_MEMORIES = [];
+const COUNTRIES = ["India","United States","United Kingdom","Canada","Australia","Bangladesh","Nepal","Bhutan","United Arab Emirates","Singapore","Malaysia","Germany","France","Others"];
+const INDIA_STATES = ["Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"];
+const ASSAM_DISTRICTS = ["Bajali", "Baksa", "Barpeta", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tinsukia", "Udalguri", "West Karbi Anglong"];
+const COUNTRY_COORDS = {
+  "India": [20.5937, 78.9629],
+  "United States": [38.9637, -95.7129],
+  "United Kingdom": [55.3781, -3.4360],
+  "Canada": [56.1304, -106.3468],
+  "Australia": [-25.2744, 133.7751],
+  "Bangladesh": [23.6850, 90.3563],
+  "Nepal": [28.3949, 84.1240],
+  "Bhutan": [27.5142, 90.4336],
+  "United Arab Emirates": [23.4241, 53.8478],
+  "Singapore": [1.3521, 103.8198],
+  "Malaysia": [4.2105, 101.9758],
+  "Germany": [51.1657, 10.4515],
+  "France": [46.6031, 1.8883],
+  "Others": [20,20]
+};
+const STATE_COORDS = {
+  "Andaman and Nicobar Islands": [11.7401, 92.6586],
+  "Andhra Pradesh": [15.9129, 79.7400],
+  "Arunachal Pradesh": [28.2180, 94.7278],
+  "Assam": [26.2006, 92.9376],
+  "Bihar": [25.0961, 85.3131],
+  "Chandigarh": [30.7333, 76.7794],
+  "Chhattisgarh": [21.2787, 81.8661],
+  "Dadra and Nagar Haveli and Daman & Diu": [20.1809, 73.0169],
+  "Delhi": [28.7041, 77.1025],
+  "Goa": [15.2993, 74.1240],
+  "Gujarat": [22.2587, 71.1924],
+  "Haryana": [29.0588, 76.0856],
+  "Himachal Pradesh": [31.1048, 77.1734],
+  "Jammu & Kashmir": [33.7782, 76.5762],
+  "Jharkhand": [23.6102, 85.2799],
+  "Karnataka": [15.3173, 75.7139],
+  "Kerala": [10.8505, 76.2711],
+  "Ladakh": [34.1526, 77.5771],
+  "Lakshadweep": [10.5667, 72.6417],
+  "Madhya Pradesh": [22.9734, 78.6569],
+  "Maharashtra": [19.7515, 75.7139],
+  "Manipur": [24.6637, 93.9063],
+  "Meghalaya": [25.4670, 91.3662],
+  "Mizoram": [23.1645, 92.9376],
+  "Nagaland": [26.1584, 94.5624],
+  "Odisha": [20.9517, 85.0985],
+  "Puducherry": [11.9416, 79.8083],
+  "Punjab": [31.1471, 75.3412],
+  "Rajasthan": [27.0238, 74.2179],
+  "Sikkim": [27.5330, 88.5122],
+  "Tamil Nadu": [11.1271, 78.6569],
+  "Telangana": [18.1124, 79.0193],
+  "Tripura": [23.9408, 91.9882],
+  "Uttar Pradesh": [26.8467, 80.9462],
+  "Uttarakhand": [30.0668, 79.0193],
+  "West Bengal": [22.9868, 87.8550]
+};
+const DISTRICT_COORDS = {
+  "Bajali": [26.4913, 91.1734],
+  "Baksa": [26.7610, 91.3507],
+  "Barpeta": [26.3273, 91.0083],
+  "Bongaigaon": [26.4716, 90.5601],
+  "Cachar": [24.8333, 92.8000],
+  "Charaideo": [27.0984, 95.1438],
+  "Chirang": [26.6500, 90.6500],
+  "Darrang": [26.4673, 92.1643],
+  "Dhemaji": [27.4833, 94.5833],
+  "Dhubri": [26.0271, 89.9740],
+  "Dibrugarh": [27.4728, 94.9113],
+  "Dima Hasao": [25.3857, 92.9118],
+  "Goalpara": [26.17, 90.62],
+  "Golaghat": [26.5167, 93.9667],
+  "Hailakandi": [24.6833, 92.5667],
+  "Jorhat": [26.7500, 94.2167],
+  "Kamrup": [26.1667, 91.7500],
+  "Kamrup Metropolitan": [26.1445, 91.7362],
+  "Karbi Anglong": [26.1685, 93.5878],
+  "Karimganj": [24.8667, 92.3500],
+  "Kokrajhar": [26.4000, 90.2667],
+  "Lakhimpur": [27.2333, 94.1167],
+  "Majuli": [27.0160, 94.2160],
+  "Morigaon": [26.2500, 92.3333],
+  "Nagaon": [26.3500, 92.6833],
+  "Nalbari": [26.4500, 91.4333],
+  "Sivasagar": [27.0000, 94.6333],
+  "Sonitpur": [26.6347, 92.7923],
+  "South Salmara-Mankachar": [25.8078, 89.9011],
+  "Tinsukia": [27.4914, 95.3619],
+  "Udalguri": [26.7667, 92.1000],
+  "West Karbi Anglong": [25.8617, 92.8364]
+};
+
+// ---------- 4. MAP ----------
+const map = L.map('map', { attributionControl:false }).setView([26.2006, 92.9376], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+let markersLayer = L.layerGroup().addTo(map);
+
+// ---------- 5. CHART ----------
+const candleCtx = document.getElementById('candleChart').getContext('2d');
+let candleChart = new Chart(candleCtx, {
+  type:'bar',
+  data: { labels:[], datasets:[{label:'Candles',data:[], backgroundColor:['#f59e0b','#60a5fa','#93c5fd','#34d399','#a3a3a3']}] },
+  options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, indexAxis: 'y'}
+});
+
+// ---------- 6. UTILITIES ----------
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function truncate(s,l){ return s.length>l? s.slice(0,l)+'...': s; }
+function renderMedia(text){
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return (text||'').replace(urlRegex, url => {
+    if (/\.(jpg|jpeg|png|gif)$/i.test(url)) return `<div class="memory-embed"><img src="${escapeHtml(url)}" loading="lazy"></div>`;
+    const yMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    if (yMatch) return `<div class="memory-embed"><iframe src="https://www.youtube.com/embed/${yMatch[1]}" frameborder="0" allowfullscreen></iframe></div>`;
+    return `<a href="${escapeHtml(url)}" target="_blank">${escapeHtml(url)}</a>`;
+  });
+}
+function getCoords(entry){
+  if (entry.district && DISTRICT_COORDS[entry.district]) return DISTRICT_COORDS[entry.district];
+  if (entry.state && STATE_COORDS[entry.state]) return STATE_COORDS[entry.state];
+  if (entry.country && COUNTRY_COORDS[entry.country]) return COUNTRY_COORDS[entry.country];
+  return null;
+}
+function createCandleElement(lit=false){
+  const d = document.createElement('div');
+  d.className = 'candle' + (lit ? ' lit glow' : '');
+  const flame = document.createElement('div'); flame.className = 'flame';
+  d.appendChild(flame);
+  return d;
+}
+
+// ---------- 7. POPULATE DROPDOWNS ----------
+function populateDropdowns(){
+  const candleCountry = document.getElementById('candleCountry');
+  const candleState = document.getElementById('candleState');
+  const candleDistrict = document.getElementById('candleDistrict');
+  const memCountry = document.getElementById('memCountry');
+  const memState = document.getElementById('memState');
+
+  ['candleCountry','memCountry'].forEach(id=>{
+    const sel = document.getElementById(id); sel.innerHTML='';
+    COUNTRIES.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+  });
+
+  [candleState, memState].forEach(select=>{
+    select.innerHTML='';
+    const d = document.createElement('option'); d.value=''; d.textContent='Select state'; select.appendChild(d);
+    INDIA_STATES.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; select.appendChild(o); });
+  });
+
+  candleDistrict.innerHTML=''; const d0=document.createElement('option'); d0.value=''; d0.textContent='Select district'; candleDistrict.appendChild(d0);
+  ASSAM_DISTRICTS.forEach(dist => { const o=document.createElement('option'); o.value=dist; o.textContent=dist; candleDistrict.appendChild(o); });
+
+  document.getElementById('candleCountry').addEventListener('change', ()=>{
+    const isIndia = document.getElementById('candleCountry').value === 'India';
+    document.getElementById('candleState').disabled = !isIndia;
+    document.getElementById('candleDistrict').disabled = !isIndia;
+    document.getElementById('candleDistrict').style.display = isIndia ? 'block' : 'none';
+    if(!isIndia){ document.getElementById('candleState').value=''; document.getElementById('candleDistrict').value=''; }
+  });
+  document.getElementById('candleState').addEventListener('change', ()=>{
+    document.getElementById('candleDistrict').style.display = (document.getElementById('candleState').value === 'Assam') ? 'block' : 'none';
+    if (document.getElementById('candleState').value !== 'Assam') document.getElementById('candleDistrict').value='';
+  });
+  document.getElementById('memCountry').addEventListener('change', ()=>{
+    const isIndia = document.getElementById('memCountry').value === 'India';
+    document.getElementById('memState').disabled = !isIndia;
+    if(!isIndia) document.getElementById('memState').value='';
+  });
+}
+populateDropdowns();
+
+// ---------- 8. RENDERING & MAP PINS ----------
+function renderMapPins(){
+  markersLayer.clearLayers();
+  const addMarker = (coords, popupText, options={})=>{
+    const marker = options.isCandle ? L.circleMarker(coords, {radius:6, color:'#ffb347', fillOpacity:0.9, weight:1}) : L.marker(coords);
+    marker.bindPopup(popupText);
+    markersLayer.addLayer(marker);
+  };
+
+  ALL_MEMORIES.forEach(m => {
+    const coords = getCoords(m);
+    if(coords){
+      const locationInfo = [m.city, m.institute].filter(Boolean).join(' • ');
+      const popupHTML = `<strong>${escapeHtml(m.name||'Anonymous')}</strong><div class="small">${escapeHtml(locationInfo)}</div><div style="margin-top:6px">${escapeHtml(truncate(m.text||'',200))}</div>`;
+      addMarker(coords, popupHTML, {isCandle:false});
     }
-    function closeModal(id) {
-      document.getElementById(id).style.display = "none";
+  });
+
+  ALL_CANDLES.forEach(c => {
+    const coords = getCoords(c);
+    if(coords){
+      const locationInfo = [c.district, c.state, c.country].filter(Boolean).join(', ');
+      const popupHTML = `<strong>Candle by ${escapeHtml(c.name||'Anonymous')}</strong><div class="small">From: ${escapeHtml(locationInfo)}</div>`;
+      addMarker(coords, popupHTML, {isCandle:true});
     }
+  });
+}
 
-    document.getElementById("openCandleModal").onclick = () => openModal("candleModal");
-    document.getElementById("candleCancel").onclick = () => closeModal("candleModal");
+function renderStatsAndCharts(){
+  const getTopN = (counts,n=5) => Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const countryC = ALL_CANDLES.reduce((a,c)=>{a[c.country]=(a[c.country]||0)+1;return a;},{});
+  const stateC = ALL_CANDLES.reduce((a,c)=>{ if(c.state) a[c.state]=(a[c.state]||0)+1; return a; },{});
+  const districtC = ALL_CANDLES.reduce((a,c)=>{ if(c.district) a[c.district]=(a[c.district]||0)+1; return a; },{});
+  const topCountries = getTopN(countryC);
+  candleChart.data.labels = topCountries.map(c=>c[0]);
+  candleChart.data.datasets[0].data = topCountries.map(c=>c[1]);
+  candleChart.update();
 
-    document.getElementById("openMemoryForm").onclick = () => openModal("memoryModal");
-    document.getElementById("memoryCancel").onclick = () => closeModal("memoryModal");
+  const topStateEl = document.getElementById('topState');
+  const ts1 = getTopN(stateC,1)[0]; topStateEl.textContent = ts1 ? `${ts1[0]} (${ts1[1]})` : '—';
+  const td1 = getTopN(districtC,1)[0]; document.getElementById('topDistrict').textContent = td1 ? `${td1[0]} (${td1[1]})` : '—';
+  const tc1 = getTopN(countryC,1)[0]; document.getElementById('topCountry').textContent = tc1 ? `${tc1[0]} (${tc1[1]})` : '—';
 
-    document.getElementById("openContactModalBtn").onclick = () => openModal("contactModal");
-    document.getElementById("contactCancel").onclick = () => closeModal("contactModal");
+  document.getElementById('topStatesList').innerHTML = getTopN(stateC).length ? getTopN(stateC).map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') : '<li class="muted">No data</li>';
+  document.getElementById('topDistrictsList').innerHTML = getTopN(districtC).length ? getTopN(districtC).map(s=>`<li>${escapeHtml(s[0])} — ${s[1]}</li>`).join('') : '<li class="muted">No data</li>';
 
-    document.querySelectorAll(".modal").forEach(m => {
-      m.addEventListener("click", e => {
-        if (e.target === m) closeModal(m.id);
-      });
-    });
+  // Country count
+  document.getElementById('countryCount').textContent = new Set(ALL_MEMORIES.map(m=>m.country).concat(ALL_CANDLES.map(c=>c.country)).filter(Boolean)).size;
+}
 
-    // ---------- 5. FORM SUBMISSIONS ----------
-    document.getElementById("candleForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("candleName").value;
-      const state = document.getElementById("candleState").value;
-      if (STATE_COORDS[state]) {
-        const [lat, lng] = STATE_COORDS[state];
-        L.marker([lat, lng]).addTo(map).bindPopup(`🕯️ Candle lit by ${name} in ${state}`).openPopup();
-        db.ref("candles").push({ name, state, lat, lng, time: Date.now() });
-      }
-      closeModal("candleModal");
-    });
+function renderAll(){
+  // counts
+  document.getElementById('candleCount').textContent = ALL_CANDLES.length.toLocaleString();
+  document.getElementById('statCandles').textContent = ALL_CANDLES.length.toLocaleString();
+  document.getElementById('memoryCount').textContent = ALL_MEMORIES.length.toLocaleString();
+  document.getElementById('statMemories').textContent = ALL_MEMORIES.length.toLocaleString();
 
-    document.getElementById("memoryForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("memoryName").value;
-      const message = document.getElementById("memoryMessage").value;
-      db.ref("memories").push({ name, message, time: Date.now() });
-      alert("Memory shared successfully!");
-      closeModal("memoryModal");
-    });
+  // candle area
+  const candleArea = document.getElementById('candleArea');
+  candleArea.innerHTML = '';
+  // show up to 100 candle visuals
+  for(let i=0;i<Math.min(ALL_CANDLES.length,100);i++){
+    const c = createCandleElement(true);
+    candleArea.appendChild(c);
+  }
 
-    document.getElementById("contactForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("contactName").value;
-      const email = document.getElementById("contactEmail").value;
-      const message = document.getElementById("contactMessage").value;
-      emailjs.send("your_service_id","your_template_id",{from_name:name,from_email:email,message:message})
-        .then(() => alert("Message sent!"))
-        .catch(err => alert("Failed to send message: " + err));
-      closeModal("contactModal");
-    });
-  </script>
+  // memory wall rotation will be handled separately
+  populateMemoryRotator();
+
+  renderMapPins();
+  renderStatsAndCharts();
+}
+
+// ---------- 9. FIRESTORE LISTENERS ----------
+db.collection("candles").orderBy("ts","desc").onSnapshot(snapshot => {
+  ALL_CANDLES = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  renderAll();
+});
+db.collection("memories").orderBy("ts","desc").onSnapshot(snapshot => {
+  ALL_MEMORIES = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  renderAll();
+});
+
+// ---------- 10. FORM SUBMISSIONS ----------
+
+// Candle submit
+document.getElementById('candleSubmit').onclick = async () => {
+  const candleMsg = document.getElementById('candleMsg');
+  if (localStorage.getItem('JOY_CANDLE_LIT')) {
+    candleMsg.textContent = 'Thank you — you have already lit a candle from this browser.';
+    return;
+  }
+  const btn = document.getElementById('candleSubmit');
+  btn.disabled = true; candleMsg.textContent = 'Processing...';
+
+  const entry = {
+    name: (document.getElementById('candleName').value || 'Anonymous').trim(),
+    country: document.getElementById('candleCountry').value || 'India',
+    state: document.getElementById('candleState').value || '',
+    district: document.getElementById('candleDistrict').value || '',
+    ts: new Date()
+  };
+
+  try {
+    await db.collection("candles").add(entry);
+    localStorage.setItem('JOY_CANDLE_LIT', 'true');
+
+    // Add a quick candle animation in the UI
+    const area = document.getElementById('candleArea');
+    const newC = createCandleElement(true);
+    newC.classList.add('lit');
+    area.insertBefore(newC, area.firstChild);
+
+    document.getElementById('candleModal').style.display = 'none';
+    document.getElementById('candleMsg').textContent = 'Thank you — candle lit!';
+  } catch(err){
+    console.error('Error adding candle:', err);
+    candleMsg.textContent = 'An error occurred. Please try again.';
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+// Memory submit
+document.getElementById('memoryForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const memoryMsg = document.getElementById('memoryMsg');
+  const fd = new FormData(ev.target);
+  if (!fd.get('text') || !fd.get('text').trim()) {
+    memoryMsg.textContent = 'Please write a memory.';
+    return;
+  }
+  const submitBtn = ev.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true; memoryMsg.textContent = 'Submitting...';
+
+  const obj = {
+    name: fd.get('name') || 'Anonymous',
+    city: fd.get('city') || '',
+    institute: fd.get('institute') || '',
+    country: fd.get('country') || 'India',
+    state: fd.get('state') || '',
+    text: fd.get('text'),
+    ts: new Date()
+  };
+
+  try {
+    await db.collection("memories").add(obj);
+    memoryMsg.textContent = 'Memory submitted — thank you!';
+    ev.target.reset();
+    document.getElementById('memoryModal').style.display = 'none';
+  } catch(err){
+    console.error('Error adding memory:', err);
+    memoryMsg.textContent = 'An error occurred. Please try again.';
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+// Suggestion submit (EmailJS)
+document.getElementById('suggestionForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const msgDiv = document.getElementById('suggestionMsg');
+  submitBtn.disabled = true; msgDiv.textContent = 'Sending...';
+
+  emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_SUGGESTION, this)
+    .then(()=>{ msgDiv.textContent = 'Suggestion sent. Thank you!'; e.target.reset(); }, (error)=>{ msgDiv.textContent='Failed to send. Please try again.'; console.error('EMAILJS FAILED', error); })
+    .finally(()=> submitBtn.disabled = false);
+});
+
+// Contact form (EmailJS)
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const msgDiv = document.getElementById('contactMsg');
+  submitBtn.disabled = true; msgDiv.textContent = 'Sending...';
+
+  emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, this)
+    .then(()=> {
+      msgDiv.textContent = 'Message sent successfully!';
+      setTimeout(()=>{ document.getElementById('contactModal').style.display = 'none'; e.target.reset(); msgDiv.textContent=''; }, 1200);
+    }, (error) => {
+      msgDiv.textContent = 'Failed to send. Please try again.';
+      console.error('EMAILJS FAILED...', error);
+    })
+    .finally(()=> submitBtn.disabled = false);
+});
+
+// ---------- 11. MODAL UI + toggles ----------
+
+// Helper functions
+function openModal(id){
+  document.getElementById(id).style.display = 'flex';
+  document.getElementById(id).setAttribute('aria-hidden','false');
+}
+function closeModal(id){
+  document.getElementById(id).style.display = 'none';
+  document.getElementById(id).setAttribute('aria-hidden','true');
+}
+
+// Wire modal open/close buttons (all)
+document.getElementById('openCandleModal').onclick = ()=> openModal('candleModal');
+document.getElementById('openCandleModal2').onclick = ()=> openModal('candleModal');
+document.getElementById('candleCancel').onclick = ()=> closeModal('candleModal');
+document.getElementById('candleCloseBtn').onclick = ()=> closeModal('candleModal');
+
+document.getElementById('openMemoryForm').onclick = ()=> { document.getElementById('memoryForm').reset(); document.getElementById('memCountry').value='India'; document.getElementById('memState').disabled=false; openModal('memoryModal'); };
+document.getElementById('openMemoryForm2').onclick = ()=> { document.getElementById('memoryForm').reset(); document.getElementById('memCountry').value='India'; document.getElementById('memState').disabled=false; openModal('memoryModal'); };
+document.getElementById('memoryCancelBtn').onclick = ()=> closeModal('memoryModal');
+document.getElementById('memoryCloseBtn').onclick = ()=> closeModal('memoryModal');
+
+document.getElementById('openContactModalBtn').onclick = ()=> openModal('contactModal');
+document.getElementById('contactCancel').onclick = ()=> closeModal('contactModal');
+document.getElementById('contactCloseBtn').onclick = ()=> closeModal('contactModal');
+
+// Close on background click for all modals
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click', (e)=>{
+    if(e.target === m) closeModal(m.id);
+  });
+});
+// Close on Escape
+window.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ document.querySelectorAll('.modal').forEach(m=> closeModal(m.id)); } });
+
+// ---------- 12. MODE (dark/light) ----------
+const modeToggle = document.getElementById('modeToggle');
+const modeLabel = document.getElementById('modeLabel');
+function setMode(d){
+  document.documentElement.classList.toggle('dark', d);
+  document.body.classList.toggle('dark', d);
+  modeLabel.textContent = d ? 'Dark Mode' : 'Light Mode';
+  localStorage.setItem('JZ_MODE_DARK', d ? '1' : '0');
+}
+modeToggle.onclick = ()=> setMode(!document.documentElement.classList.contains('dark'));
+setMode(localStorage.getItem('JZ_MODE_DARK') === '1' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+
+// ---------- 13. MEMORY WALL ROTATOR (auto-play up to 10 most recent) ----------
+let rotatorTimer = null;
+let rotatorIndex = 0;
+function populateMemoryRotator(){
+  const wall = document.getElementById('memoryWall');
+  wall.innerHTML = '';
+  if(!ALL_MEMORIES.length){
+    wall.innerHTML = '<div class="muted" style="padding:12px;">No memories yet. Be the first to share one!</div>';
+    return;
+  }
+  // take up to 10 most recent
+  const slides = ALL_MEMORIES.slice(0,10).map(m => {
+    const slide = document.createElement('div'); slide.className='slide';
+    slide.innerHTML = `<div class="memory-item"><strong>${escapeHtml(m.name||'Anonymous')}</strong> <span class="muted">• ${escapeHtml([m.city,m.institute].filter(Boolean).join(' • '))}</span><div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;">${renderMedia(escapeHtml(m.text||''))}</div></div>`;
+    return slide;
+  });
+  slides.forEach((s,i)=>{ s.style.zIndex = slides.length - i; wall.appendChild(s); });
+  // activate first
+  rotatorIndex = 0;
+  slides.forEach(s => s.classList.remove('active'));
+  if(slides[0]) slides[0].classList.add('active');
+
+  // clear previous timer
+  if(rotatorTimer) { clearInterval(rotatorTimer); rotatorTimer = null; }
+
+  // auto-rotate every 5s
+  rotatorTimer = setInterval(()=>{
+    const next = (rotatorIndex + 1) % slides.length;
+    slides[rotatorIndex].classList.remove('active');
+    slides[next].classList.add('active');
+    rotatorIndex = next;
+  }, 5000);
+
+  // pause on hover
+  wall.addEventListener('mouseenter', ()=> { if(rotatorTimer) clearInterval(rotatorTimer); });
+  wall.addEventListener('mouseleave', ()=> {
+    if(rotatorTimer) clearInterval(rotatorTimer);
+    rotatorTimer = setInterval(()=>{
+      const next = (rotatorIndex + 1) % slides.length;
+      slides[rotatorIndex].classList.remove('active');
+      slides[next].classList.add('active');
+      rotatorIndex = next;
+    }, 5000);
+  }, { once: false });
+}
+
+// ---------- 14. INITIAL RENDER ----------
+function init(){
+  renderAll();
+  console.log('Joy Zubeen tribute site initialized.');
+}
+init();
+
+// ---------- 15. Safety: handle missing image/iframe URLs gracefully (already done in renderMedia) ----------
+
+</script>
 </body>
 </html>
