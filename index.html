@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Joy Zubeenda — Remembering Zubeen Garg</title>
 
+<!-- External libraries -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -91,10 +92,21 @@ textarea{resize:vertical}
     </div>
   </header>
 
-  <!-- Example trigger -->
-  <button id="openCandleModal" class="btn-primary">Light Your Candle</button>
-  <button id="openMemoryForm" class="btn-primary">Share a Memory</button>
-  <button id="openContactModalBtn" class="btn-primary">Contact Me</button>
+  <!-- Candle counter & chart -->
+  <div class="grid">
+    <div class="card">
+      <h3 class="section-title">Virtual Candles</h3>
+      <div class="counter" id="candleCount">0</div>
+      <canvas id="candleChart" height="100"></canvas>
+      <button id="openCandleModal" class="btn-primary" style="margin-top:12px;">Light a Candle</button>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Share a Memory</h3>
+      <button id="openMemoryForm" class="btn-primary">Add Your Tribute</button>
+      <div id="memoryList" class="muted small" style="margin-top:10px;">No memories yet.</div>
+    </div>
+  </div>
 
   <!-- Global Legacy Map -->
   <div class="card map-container" style="margin-top:20px;">
@@ -107,7 +119,11 @@ textarea{resize:vertical}
 <div id="candleModal" class="modal">
   <div style="background:var(--card);padding:18px;border-radius:12px;max-width:720px;width:100%">
     <h3>Light a Candle</h3>
-    <button id="candleCancel" class="btn-ghost">Cancel</button>
+    <form id="candleForm">
+      <input type="text" id="candleName" placeholder="Your name" required />
+      <button type="submit" class="btn-primary">Submit</button>
+      <button type="button" id="candleCancel" class="btn-ghost">Cancel</button>
+    </form>
   </div>
 </div>
 
@@ -115,7 +131,12 @@ textarea{resize:vertical}
 <div id="memoryModal" class="modal">
   <div style="background:var(--card);padding:18px;border-radius:12px;max-width:820px;width:100%">
     <h3>Share a Memory</h3>
-    <button id="memoryCancel" class="btn-ghost">Cancel</button>
+    <form id="memoryForm">
+      <input type="text" id="memoryName" placeholder="Your name" required />
+      <textarea id="memoryText" placeholder="Write your memory..." required></textarea>
+      <button type="submit" class="btn-primary">Submit</button>
+      <button type="button" id="memoryCancel" class="btn-ghost">Cancel</button>
+    </form>
   </div>
 </div>
 
@@ -123,26 +144,34 @@ textarea{resize:vertical}
 <div id="contactModal" class="modal">
   <div style="background:var(--card);padding:18px;border-radius:12px;max-width:520px;width:100%">
     <h3>Contact Me</h3>
-    <button id="contactCancel" class="btn-ghost">Cancel</button>
+    <form id="contactForm">
+      <input type="email" id="contactEmail" placeholder="Your email" required />
+      <textarea id="contactMessage" placeholder="Your message..." required></textarea>
+      <button type="submit" class="btn-primary">Send</button>
+      <button type="button" id="contactCancel" class="btn-ghost">Cancel</button>
+    </form>
   </div>
 </div>
 
 <script>
-// Modal logic
+// Firebase config (replace with your own!)
+firebase.initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+});
+const db = firebase.firestore();
+
+// Modal setup
 function setupModal(openBtnId, modalId, cancelBtnId) {
   const openBtn = document.getElementById(openBtnId);
   const modal = document.getElementById(modalId);
   const cancelBtn = document.getElementById(cancelBtnId);
-
   if (!openBtn || !modal) return;
-
   openBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
   cancelBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) modal.style.display = 'none';
-  });
+  window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
 }
-
 setupModal('openCandleModal','candleModal','candleCancel');
 setupModal('openMemoryForm','memoryModal','memoryCancel');
 setupModal('openContactModalBtn','contactModal','contactCancel');
@@ -150,20 +179,85 @@ setupModal('openContactModalBtn','contactModal','contactCancel');
 // Dark mode toggle
 const toggleBtn = document.getElementById("modeToggle");
 const modeLabel = document.getElementById("modeLabel");
-
 toggleBtn.addEventListener("click", () => {
   document.body.classList.toggle("dark");
   modeLabel.textContent = document.body.classList.contains("dark") ? "Dark Mode" : "Light Mode";
 });
 
-// Leaflet Map
+// Leaflet map
 const map = L.map("map").setView([20, 80], 4);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "© OpenStreetMap contributors"
 }).addTo(map);
 
-// Add one marker (example)
+// Example marker
 L.marker([26.1445, 91.7362]).addTo(map).bindPopup("Guwahati, Assam — Zubeen's Legacy");
+
+// Chart.js candle chart
+const ctx = document.getElementById("candleChart").getContext("2d");
+const candleChart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: [],
+    datasets: [{label:"Candles", data:[], backgroundColor:"#ffb347"}]
+  },
+  options: {responsive:true, plugins:{legend:{display:false}}}
+});
+
+// Candle form
+const candleForm = document.getElementById("candleForm");
+candleForm.addEventListener("submit", async(e)=>{
+  e.preventDefault();
+  const name = document.getElementById("candleName").value;
+  await db.collection("candles").add({name, time:firebase.firestore.FieldValue.serverTimestamp()});
+  candleForm.reset();
+  document.getElementById("candleModal").style.display="none";
+});
+
+// Memory form
+const memoryForm = document.getElementById("memoryForm");
+memoryForm.addEventListener("submit", async(e)=>{
+  e.preventDefault();
+  const name = document.getElementById("memoryName").value;
+  const text = document.getElementById("memoryText").value;
+  await db.collection("memories").add({name,text,time:firebase.firestore.FieldValue.serverTimestamp()});
+  memoryForm.reset();
+  document.getElementById("memoryModal").style.display="none";
+});
+
+// Contact form (via EmailJS)
+emailjs.init("YOUR_EMAILJS_USERID");
+document.getElementById("contactForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  emailjs.send("YOUR_SERVICE_ID","YOUR_TEMPLATE_ID",{
+    email:document.getElementById("contactEmail").value,
+    message:document.getElementById("contactMessage").value
+  }).then(()=>alert("Message sent!"));
+  e.target.reset();
+  document.getElementById("contactModal").style.display="none";
+});
+
+// Live updates from Firestore
+db.collection("candles").orderBy("time","asc").onSnapshot(snap=>{
+  const count = snap.size;
+  document.getElementById("candleCount").textContent = count;
+  const labels = snap.docs.map((_,i)=>i+1);
+  candleChart.data.labels = labels;
+  candleChart.data.datasets[0].data = labels.map(()=>1);
+  candleChart.update();
+});
+
+db.collection("memories").orderBy("time","desc").onSnapshot(snap=>{
+  const list = document.getElementById("memoryList");
+  if(snap.empty){list.textContent="No memories yet.";return;}
+  list.innerHTML="";
+  snap.forEach(doc=>{
+    const d = doc.data();
+    const div=document.createElement("div");
+    div.textContent=`${d.name}: ${d.text}`;
+    list.appendChild(div);
+  });
+});
 </script>
 </body>
 </html>
