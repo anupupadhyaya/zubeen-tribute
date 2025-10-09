@@ -111,27 +111,14 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 .quote-item.active{opacity:1;transform:translateY(0)}
 .quote-author{margin-top:10px;font-size:13px;color:#cbd5e1}
 
-/* --- Mobile-friendly gallery + quotes layout --- */
+/* small screen adjustments */
 @media (max-width:980px){
-  .gallery-section {
-    grid-template-columns:1fr; 
-    padding:12px;
-  }
-  .gallery-left { order:1 }
-  .gallery-right { 
-    order:2; 
-    display: flex;      /* ensure it shows */
-    flex-direction: column;
-    gap: 12px;
-    margin-top:12px;
-  }
-  .gallery-grid img { height:140px }
-  .quote-slider { 
-    height:auto; 
-    min-height:80px;    /* ensures slider looks okay on mobile */
-  }
+  .gallery-section{grid-template-columns:1fr; padding:12px}
+  .gallery-right{order:2}
+  .gallery-grid img{height:140px}
+  .quotes-right{display:none}
+  .quote-slider{height:auto}
 }
-
 
 /* --- Music section styles --- */
 .music-section{display:flex;gap:12px;align-items:flex-start;margin-top:12px}
@@ -158,33 +145,27 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 <button class="btn-primary" id="openMemoryForm">Share a Memory</button>
 </div>
 </header>
-<!-- TOP VISUALS: Photo gallery + Iconic Lines slide (mobile-friendly) -->
+<!-- TOP VISUALS: Photo gallery + Famous Sayings slide (under the hero header) -->
 <div class="top-visuals">
-  <!-- Gallery + Quotes Wrapper -->
-  <section aria-labelledby="galleryHeading" class="gallery-section card">
-    <!-- Left: Photo Gallery -->
-    <div class="gallery-left">
-      <h3 class="gallery-title" id="galleryHeading">📸 Zubeen Garg — Photo Gallery</h3>
-      <div class="gallery-grid" id="galleryGrid" style="margin-top:12px">
-        <img alt="Zubeen Garg 1" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen1.jpeg"/>
-        <img alt="Zubeen Garg 2" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen2.jpeg"/>
-        <img alt="Zubeen Garg 3" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen3.jpeg"/>
-        <img alt="Zubeen Garg 4" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen4.jpeg"/>
-      </div>
-    </div>
-
-    <!-- Right: Iconic Lines / Quotes -->
-    <div class="gallery-right quotes-section quotes-right">
-      <h4 class="quotes-title" id="iconicHeading" style="margin:0">💬 Iconic Lines by Zubeen Garg</h4>
-      <div aria-atomic="true" aria-live="polite" class="quote-slider" id="quoteSlider" style="margin-top:10px">
-        <div class="quote-item active">“I have no caste, no religion. I don't believe in God. I am free. I am Kanchenjunga!”</div>
-        <div class="quote-item">“Assam is Famous for Tea, Rhino, and Zubeen.”</div>
-        <div class="quote-item">“I live like a King, and a King should not leave his kingdom.”div>
-      </div>
-    </div>
-  </section>
+<!-- Gallery Section -->
+<section aria-labelledby="galleryHeading" class="gallery-section card">
+<div class="gallery-left">
+<h3 class="gallery-title" id="galleryHeading">📸 Zubeen Garg — Photo Gallery</h3>
+<div class="gallery-grid" id="galleryGrid" style="margin-top:12px">
+<!-- Images (public links) -->
+<img alt="Zubeen Garg 1" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen1.jpeg"/>
+<img alt="Zubeen Garg 2" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen2.jpeg"/>
+<img alt="Zubeen Garg 3" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen3.jpeg"/>
+<img alt="Zubeen Garg 4" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen4.jpeg"/>
 </div>
-
+</div>
+<div class="gallery-right quotes-section">
+<h4 class="quotes-title" id="iconicHeading" style="margin:0">💬 Iconic Lines by Zubeen Garg</h4>
+<div aria-atomic="true" aria-live="polite" class="quote-slider" id="quoteSlider" style="margin-top:10px">
+<div class="quote-item active">“I have no caste, no religion. I don't believe in God. I am free. I am Kanchenjunga!”</div>
+<div class="quote-item">“Assam is Famous for Tea, Rhino, and Zubeen.”</div>
+<div class="quote-item">“I live like a King, and a King should not leave his kingdom.”</div>
+</div>
 
 <!-- Music section placed directly below iconic lines, fills the extra space -->
 <div class="music-section" style="width:100%; margin-top:12px">
@@ -913,9 +894,6 @@ quoteSliderEl.addEventListener('mouseenter', ()=> { clearInterval(quoteTimer); }
 quoteSliderEl.addEventListener('mouseleave', ()=> { clearInterval(quoteTimer); quoteTimer = setInterval(nextQuote,4500); });
 
 // ---------- 17. Safety: handle missing image/iframe URLs gracefully (already done in renderMedia) ----------
-
+</script>
 </body>
 </html>
-
-
-
