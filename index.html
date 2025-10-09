@@ -805,7 +805,7 @@ function populateMemoryRotator(){
   const wall = document.getElementById('memoryWall');
   wall.innerHTML = '';
   if(!ALL_MEMORIES.length){
-    wall.innerHTML = '<div class="muted" style="padding:12px;">No memories yet. Awaiting approvals.</div>';
+    wall.innerHTML = '<div class="muted" style="padding:12px;">No memories yet.</div>';
     return;
   }
   // take up to 10 most recent
@@ -897,3 +897,4 @@ quoteSliderEl.addEventListener('mouseleave', ()=> { clearInterval(quoteTimer); q
 </script>
 </body>
 </html>
+
