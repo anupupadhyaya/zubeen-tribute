@@ -1,24 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>#JoyZubeenDa : Remembering Zubeen Garg's Legacy</title>
-
 <!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <!-- Firebase (v8 compat as used in your original code) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
 <!-- EmailJS -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" type="text/javascript"></script>
 <style>
 :root{
   --accent:#0b74ff; --bg:#f6f7fb; --card:#ffffff; --text:#0b1726;
@@ -92,7 +88,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 .top-visuals{width:100%;margin-top:14px;display:flex;flex-direction:column;gap:14px}
 .gallery-section{background:linear-gradient(135deg,#ffffff99, #f3f6fb);border-radius:12px;padding:14px;display:grid;grid-template-columns:1fr 420px;gap:14px;align-items:start}
 .gallery-left{padding:8px}
-.gallery-right{padding:8px;border-radius:8px;background:linear-gradient(180deg,#fff,#f7fbff);box-shadow:var(--card-shadow);min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.gallery-right{padding:8px;border-radius:8px;background:linear-gradient(180deg,#fff,#f7fbff);box-shadow:var(--card-shadow);min-height:400px;display:flex;flex-direction:column;justify-content:space-between;align-items:center}
 .gallery-title{font-size:18px;margin:0 0 6px 0}
 .gallery-sub{font-size:13px;color:var(--muted)}
 .gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gallery-gap)}
@@ -133,262 +129,233 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 </head>
 <body>
 <div class="wrap" id="pageWrap">
-  <header>
-    <div class="brand">
-      <div class="logo">JZ</div>
-      <div class="hero-text">
-        <h1>Remembering Zubeen Garg</h1>
-        <div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
-      </div>
-    </div>
+<header>
+<div class="brand">
+<div class="logo">JZ</div>
+<div class="hero-text">
+<h1>Remembering Zubeen Garg</h1>
+<div class="tagline">The Pride of Assam • 40+ Languages • 38,000+ Songs • Forever in Our Hearts</div>
+</div>
+</div>
+<!-- Right side controls (keeps compact on mobile) -->
+<div class="controls" id="headerControls">
+<div class="pill small" id="modeLabel">Light Mode</div>
+<button class="btn-ghost" id="modeToggle">Switch</button>
+<button class="btn-primary" id="openCandleModal">Light Your Candle</button>
+<button class="btn-primary" id="openMemoryForm">Share a Memory</button>
+</div>
+</header>
+<!-- TOP VISUALS: Photo gallery + Famous Sayings slide (under the hero header) -->
+<div class="top-visuals">
+<!-- Gallery Section -->
+<section aria-labelledby="galleryHeading" class="gallery-section card">
+<div class="gallery-left">
+<h3 class="gallery-title" id="galleryHeading">📸 Zubeen Garg — Photo Gallery</h3>
+<div class="gallery-grid" id="galleryGrid" style="margin-top:12px">
+<!-- Images (public links) -->
+<img alt="Zubeen Garg 1" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen1.jpeg"/>
+<img alt="Zubeen Garg 2" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen2.jpeg"/>
+<img alt="Zubeen Garg 3" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen3.jpeg"/>
+<img alt="Zubeen Garg 4" src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen4.jpeg"/>
+</div>
+</div>
+<div class="gallery-right quotes-section">
+<h4 class="quotes-title" id="iconicHeading" style="margin:0">💬 Iconic Lines by Zubeen Garg</h4>
+<div aria-atomic="true" aria-live="polite" class="quote-slider" id="quoteSlider" style="margin-top:10px">
+<div class="quote-item active">“I have no caste, no religion. I don't believe in God. I am free. I am Kanchenjunga!”</div>
+<div class="quote-item">“Assam is Famous for Tea, Rhino, and Zubeen.”</div>
+<div class="quote-item">“I live like a King, and a King should not leave his kingdom.”</div>
+</div>
 
-    <!-- Right side controls (keeps compact on mobile) -->
-    <div class="controls" id="headerControls">
-      <div class="pill small" id="modeLabel">Light Mode</div>
-      <button id="modeToggle" class="btn-ghost">Switch</button>
-      <button id="openCandleModal" class="btn-primary">Light Your Candle</button>
-      <button id="openMemoryForm" class="btn-primary">Share a Memory</button>
-    </div>
-  </header>
+<!-- Music section placed directly below iconic lines, fills the extra space -->
+<div class="music-section" style="width:100%; margin-top:12px">
+<!-- YouTube embed: autoplay muted (some browsers may block autoplay; muted ensures it can autoplay) -->
+<div aria-hidden="false" aria-label="YouTube player" class="music-embed">
+<!-- Video ID used here is an example; change the ID to the video you want. It is concrete and not a placeholder. -->
+<iframe allow="autoplay; encrypted-media" loading="lazy" src="https://www.youtube.com/embed/videoseries?list=PL3cTse0YhM79CcS9HP_BpzPkuJe94EYV7" title="Zubeen Garg - Iconic Song"></iframe>
 
-  <!-- TOP VISUALS: Photo gallery + Famous Sayings slide (under the hero header) -->
-  <div class="top-visuals">
-    <!-- Gallery Section -->
-    <section class="gallery-section card" aria-labelledby="galleryHeading">
-      <div class="gallery-left">
-        <h3 id="galleryHeading" class="gallery-title">📸 Zubeen Garg — Photo Gallery</h3>
-        <div class="gallery-grid" id="galleryGrid" style="margin-top:12px">
-          <!-- Images (public links) -->
-          <img src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen1.jpeg" alt="Zubeen Garg 1">
-          <img src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen2.jpeg" alt="Zubeen Garg 2">
-          <img src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen3.jpeg" alt="Zubeen Garg 3">
-          <img src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen4.jpeg" alt="Zubeen Garg 4">
-        </div>
-      </div>
+</div>
+<!-- Spotify embed -->
+<div aria-hidden="false" aria-label="Spotify player" class="music-embed">
+<!-- This points to a Spotify embed URL. Replace if you want a different playlist. -->
+<iframe allow="encrypted-media" loading="lazy" src="https://open.spotify.com/embed/artist/3mpgtUc7wYBNjr04gEiQ4u?utm_source=generator" title="Zubeen Garg Playlist"></iframe>
 
-      <div class="gallery-right quotes-section">
-        <h4 class="quotes-title" id="iconicHeading" style="margin:0">💬 Iconic Lines by Zubeen Garg</h4>
-        <div class="quote-slider" id="quoteSlider" aria-live="polite" aria-atomic="true" style="margin-top:10px">
-          <div class="quote-item active">“I have no caste, no religion. I don't believe in God. I am free. I am Kanchenjunga!”</div>
-          <div class="quote-item">“Assam is Famous for Tea, Rhino, and Zubeen.”</div>
-          <div class="quote-item">“I live like a King, and a King should not leave his kingdom.”</div>
-        </div>
-        <div class="quote-author muted" style="margin-top:10px">— Zubeen Garg</div>
-
-        <!-- Music section placed directly below iconic lines, fills the extra space -->
-        <div class="music-section" style="width:100%; margin-top:12px">
-          <!-- YouTube embed: autoplay muted (some browsers may block autoplay; muted ensures it can autoplay) -->
-          <div class="music-embed" aria-hidden="false" aria-label="YouTube player">
-            <!-- Video ID used here is an example; change the ID to the video you want. It is concrete and not a placeholder. -->
-            <iframe src="https://www.youtube.com/embed/lVjCqVq2F6U?autoplay=1&mute=1&rel=0&modestbranding=1" title="Zubeen Garg - Iconic Song" allow="autoplay; encrypted-media" loading="lazy"></iframe>
-            <div class="small muted" style="margin-top:8px;text-align:center">YouTube (auto-muted). Use the controls to unmute.</div>
-          </div>
-
-          <!-- Spotify embed -->
-          <div class="music-embed" aria-hidden="false" aria-label="Spotify player">
-            <!-- This points to a Spotify embed URL. Replace if you want a different playlist. -->
-            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DZ06evO0n4XKh" title="Zubeen Garg Playlist" allow="encrypted-media" loading="lazy"></iframe>
-            <div class="small muted" style="margin-top:8px;text-align:center">Spotify playlist — open in Spotify for playback if needed.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Lightbox container (hidden, toggled by JS) -->
-    <div id="galleryLightbox" class="gallery-lightbox" role="dialog" aria-hidden="true">
-      <button class="lb-close" id="lbCloseBtn">&times;</button>
-      <img id="lbImage" src="" alt="Enlarged Zubeen image">
-    </div>
-
-  </div>
-
-  <!-- Original site content (candle card, memory wall, map, stats, forms etc.) -->
-  <div class="grid" style="margin-top:16px">
-    <main>
-      <!-- Candle card -->
-      <section class="card" id="candleCard">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="section-title">🕯️ Light a Virtual Candle</div>
-            <div class="muted">Join fans across the world to honor Zubeen Garg's legacy.</div>
-          </div>
-          <div style="text-align:right">
-            <div class="muted">Total Candles Lit</div>
-            <div class="counter" id="candleCount">0</div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px" class="row">
-          <button id="openCandleModal2" class="btn-primary">Light Your Candle</button>
-          <div class="hint" style="margin-left:8px"></div>
-        </div>
-
-        <div class="virtual-candles" id="candleArea" aria-hidden="true" style="min-height:60px"></div>
-
-        <div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-          <div style="max-width:320px;"><canvas id="candleChart" style="height:180px"></canvas></div>
-          <div style="flex:1; min-width:240px;">
-            <div class="top-stats">
-              <div class="stat"><small>Top State</small><strong id="topState">—</strong></div>
-              <div class="stat"><small>Top District (Assam)</small><strong id="topDistrict">—</strong></div>
-              <div class="stat"><small>Top Country</small><strong id="topCountry">—</strong></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Memory wall -->
-      <section class="card" id="memoryCard" style="margin-top:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="section-title">🖼️ Global Memory Wall</div>
-            <div class="muted"><span id="memoryCount">0</span> memories shared</div>
-          </div>
-          <div><button id="openMemoryForm2" class="btn-primary">Share a Memory</button></div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div id="memoryWall" class="memory-rotator">
-            <!-- slides populated by JS -->
-          </div>
-        </div>
-      </section>
-
-      <section class="card" style="margin-top:16px">
-        <div class="section-title">📜 Timeline & Beliefs</div>
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="flex:1">
-            <p><strong>1972</strong> : Born. Early musical interest.</p>
-            <p><strong>2000s</strong> : Became a multi-lingual recording artist, singing in 40+ languages.</p>
-            <p><strong>2010s</strong> : Social activism & animal rights. Championed cultural pride.</p>
-            <p><strong>Legacy</strong> : A powerful voice across India & abroad; celebrated by fans worldwide.</p>
-          </div>
-          <div style="width:240px">
-            <div class="card small"><div class="small muted">Notable</div><div style="margin-top:6px"><strong>40+</strong> languages</div><div><strong>38,000+</strong> songs</div></div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <aside>
-      <div class="card map-card">
-        <div class="section-title">🌍 Global Legacy Map</div>
-        <div class="muted">Pins from memories & candles. Countries represented: <strong id="countryCount">0</strong></div>
-        <div class="map-container" id="map"></div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div class="section-title">Live Stats</div>
-        <div class="stat" style="text-align:left; min-width: 0;"><small>Total Candles</small><strong id="statCandles">0</strong></div>
-        <div style="height:10px"></div>
-        <div class="stat" style="text-align:left; min-width: 0;"><small>Total Memories</small><strong id="statMemories">0</strong></div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div class="section-title">Top Regions</div>
-        <div class="muted">Top 5 states (candles)</div><ol id="topStatesList"></ol>
-        <div class="muted">Top Assam districts</div><ol id="topDistrictsList"></ol>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div class="section-title">💡 Suggestions</div>
-        <form id="suggestionForm">
-          <textarea name="suggestion" rows="4" placeholder="Have a suggestion to improve this site?" required></textarea>
-          <button type="submit" class="btn-primary" style="width:100%; margin-top:8px;">Send Suggestion</button>
-          <div id="suggestionMsg" class="hint">Your feedback is appreciated!</div>
-        </form>
-      </div>
-
-    </aside>
-  </div>
-
-  <div class="footer">
+</div>
+</div>
+</div>
+</section>
+<!-- Lightbox container (hidden, toggled by JS) -->
+<div aria-hidden="true" class="gallery-lightbox" id="galleryLightbox" role="dialog">
+<button class="lb-close" id="lbCloseBtn">×</button>
+<img alt="Enlarged Zubeen image" id="lbImage" src=""/>
+</div>
+</div>
+<!-- Original site content (candle card, memory wall, map, stats, forms etc.) -->
+<div class="grid" style="margin-top:16px">
+<main>
+<!-- Candle card -->
+<section class="card" id="candleCard">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div>
+<div class="section-title">🕯️ Light a Virtual Candle</div>
+<div class="muted">Join fans across the world to honor Zubeen Garg's legacy.</div>
+</div>
+<div style="text-align:right">
+<div class="muted">Total Candles Lit</div>
+<div class="counter" id="candleCount">0</div>
+</div>
+</div>
+<div class="row" style="margin-top:12px">
+<button class="btn-primary" id="openCandleModal2">Light Your Candle</button>
+<div class="hint" style="margin-left:8px"></div>
+</div>
+<div aria-hidden="true" class="virtual-candles" id="candleArea" style="min-height:60px"></div>
+<div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+<div style="max-width:320px;"><canvas id="candleChart" style="height:180px"></canvas></div>
+<div style="flex:1; min-width:240px;">
+<div class="top-stats">
+<div class="stat"><small>Top State</small><strong id="topState">—</strong></div>
+<div class="stat"><small>Top District (Assam)</small><strong id="topDistrict">—</strong></div>
+<div class="stat"><small>Top Country</small><strong id="topCountry">—</strong></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Memory wall -->
+<section class="card" id="memoryCard" style="margin-top:14px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div>
+<div class="section-title">🖼️ Global Memory Wall</div>
+<div class="muted"><span id="memoryCount">0</span> memories shared</div>
+</div>
+<div><button class="btn-primary" id="openMemoryForm2">Share a Memory</button></div>
+</div>
+<div style="margin-top:12px">
+<div class="memory-rotator" id="memoryWall">
+<!-- slides populated by JS -->
+</div>
+</div>
+</section>
+<section class="card" style="margin-top:16px">
+<div class="section-title">📜 Timeline &amp; Beliefs</div>
+<div style="display:flex;gap:12px;align-items:flex-start">
+<div style="flex:1">
+<p><strong>1972</strong> : Born. Early musical interest.</p>
+<p><strong>2000s</strong> : Became a multi-lingual recording artist, singing in 40+ languages.</p>
+<p><strong>2010s</strong> : Social activism &amp; animal rights. Championed cultural pride.</p>
+<p><strong>Legacy</strong> : A powerful voice across India &amp; abroad; celebrated by fans worldwide.</p>
+</div>
+<div style="width:240px">
+<div class="card small"><div class="small muted">Notable</div><div style="margin-top:6px"><strong>40+</strong> languages</div><div><strong>38,000+</strong> songs</div></div>
+</div>
+</div>
+</section>
+</main>
+<aside>
+<div class="card map-card">
+<div class="section-title">🌍 Global Legacy Map</div>
+<div class="muted">Pins from memories &amp; candles. Countries represented: <strong id="countryCount">0</strong></div>
+<div class="map-container" id="map"></div>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="section-title">Live Stats</div>
+<div class="stat" style="text-align:left; min-width: 0;"><small>Total Candles</small><strong id="statCandles">0</strong></div>
+<div style="height:10px"></div>
+<div class="stat" style="text-align:left; min-width: 0;"><small>Total Memories</small><strong id="statMemories">0</strong></div>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="section-title">Top Regions</div>
+<div class="muted">Top 5 states (candles)</div><ol id="topStatesList"></ol>
+<div class="muted">Top Assam districts</div><ol id="topDistrictsList"></ol>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="section-title">💡 Suggestions</div>
+<form id="suggestionForm">
+<textarea name="suggestion" placeholder="Have a suggestion to improve this site?" required="" rows="4"></textarea>
+<button class="btn-primary" style="width:100%; margin-top:8px;" type="submit">Send Suggestion</button>
+<div class="hint" id="suggestionMsg">Your feedback is appreciated!</div>
+</form>
+</div>
+</aside>
+</div>
+<div class="footer">
     Built with ❤️ for Zubeen-Da. This is a non-commercial, shared tribute.
     <div class="footer-links"><button id="openContactModalBtn">Contact Me</button></div>
-  </div>
 </div>
-
+</div>
 <!-- Candle Modal -->
-<div id="candleModal" class="modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="candleTitle">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3 id="candleTitle" style="margin:0">Light a Candle</h3>
-      <button class="close" id="candleCloseBtn">&times;</button>
-    </div>
-    <div class="muted">Choose your location and light a virtual candle. You can light only once per browser session.</div>
-
-    <div style="margin-top:12px">
-      <label class="small">Name (optional)</label><input id="candleName" placeholder="Your name (or leave blank)" />
-    </div>
-
-    <div style="margin-top:8px" class="row">
-      <div style="flex:1">
-        <label class="small">Country</label>
-        <select id="candleCountry"></select>
-      </div>
-      <div style="flex:1">
-        <label class="small">State (India only)</label>
-        <select id="candleState"></select>
-      </div>
-    </div>
-
-    <div style="margin-top:8px">
-      <label class="small">District (Assam only)</label>
-      <select id="candleDistrict"></select>
-    </div>
-
-    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-      <button type="button" id="candleCancel" class="btn-ghost">Cancel</button>
-      <button id="candleSubmit" class="btn-primary">Light Candle</button>
-    </div>
-    <div id="candleMsg" class="muted" style="margin-top:8px"></div>
-  </div>
+<div aria-hidden="true" class="modal" id="candleModal">
+<div aria-labelledby="candleTitle" aria-modal="true" class="modal-card" role="dialog">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h3 id="candleTitle" style="margin:0">Light a Candle</h3>
+<button class="close" id="candleCloseBtn">×</button>
 </div>
-
+<div class="muted">Choose your location and light a virtual candle. You can light only once per browser session.</div>
+<div style="margin-top:12px">
+<label class="small">Name (optional)</label><input id="candleName" placeholder="Your name (or leave blank)"/>
+</div>
+<div class="row" style="margin-top:8px">
+<div style="flex:1">
+<label class="small">Country</label>
+<select id="candleCountry"></select>
+</div>
+<div style="flex:1">
+<label class="small">State (India only)</label>
+<select id="candleState"></select>
+</div>
+</div>
+<div style="margin-top:8px">
+<label class="small">District (Assam only)</label>
+<select id="candleDistrict"></select>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+<button class="btn-ghost" id="candleCancel" type="button">Cancel</button>
+<button class="btn-primary" id="candleSubmit">Light Candle</button>
+</div>
+<div class="muted" id="candleMsg" style="margin-top:8px"></div>
+</div>
+</div>
 <!-- Memory Modal -->
-<div id="memoryModal" class="modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="memoryTitle">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3 id="memoryTitle" style="margin:0">Share a Memory</h3>
-      <button class="close" id="memoryCloseBtn">&times;</button>
-    </div>
-    <div class="muted">Your submission will be stored for review and will only appear on the Memory Wall after approval.</div>
-
-    <form id="memoryForm" style="margin-top:12px;display:grid;gap:8px">
-      <div style="display:flex;gap:8px"><input name="name" placeholder="Your name (or anonymous)" /><input name="email" placeholder="Email (optional, not displayed)" /></div>
-      <div style="display:flex;gap:8px"><input name="city" placeholder="City / Town" /><input name="institute" placeholder="Institute / Profession" /></div>
-      <div style="display:flex;gap:8px"><select name="country" id="memCountry"></select><select name="state" id="memState"></select></div>
-      <div><textarea name="text" rows="4" placeholder="Write your memory here. You can also paste a YouTube or image URL."></textarea></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button type="button" id="memoryCancelBtn" class="btn-ghost">Cancel</button>
-        <button type="submit" class="btn-primary">Submit Memory</button>
-      </div>
-      <div id="memoryMsg" class="muted"></div>
-    </form>
-  </div>
+<div aria-hidden="true" class="modal" id="memoryModal">
+<div aria-labelledby="memoryTitle" aria-modal="true" class="modal-card" role="dialog">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h3 id="memoryTitle" style="margin:0">Share a Memory</h3>
+<button class="close" id="memoryCloseBtn">×</button>
 </div>
-
+<div class="muted">Your submission will be stored for review and will only appear on the Memory Wall after approval.</div>
+<form id="memoryForm" style="margin-top:12px;display:grid;gap:8px">
+<div style="display:flex;gap:8px"><input name="name" placeholder="Your name (or anonymous)"/><input name="email" placeholder="Email (optional, not displayed)"/></div>
+<div style="display:flex;gap:8px"><input name="city" placeholder="City / Town"/><input name="institute" placeholder="Institute / Profession"/></div>
+<div style="display:flex;gap:8px"><select id="memCountry" name="country"></select><select id="memState" name="state"></select></div>
+<div><textarea name="text" placeholder="Write your memory here. You can also paste a YouTube or image URL." rows="4"></textarea></div>
+<div style="display:flex;gap:8px;justify-content:flex-end">
+<button class="btn-ghost" id="memoryCancelBtn" type="button">Cancel</button>
+<button class="btn-primary" type="submit">Submit Memory</button>
+</div>
+<div class="muted" id="memoryMsg"></div>
+</form>
+</div>
+</div>
 <!-- Contact Modal -->
-<div id="contactModal" class="modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3 id="contactTitle" style="margin:0">Contact Me</h3>
-      <button class="close" id="contactCloseBtn">&times;</button>
-    </div>
-    <form id="contactForm" style="margin-top:12px;display:grid;gap:8px">
-      <input name="contact_name" placeholder="Your Name" required />
-      <input name="contact_email" type="email" placeholder="Your Email" required />
-      <input name="contact_mobile" placeholder="Your Mobile Number (Optional)" />
-      <textarea name="contact_message" rows="4" placeholder="Your Message" required></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button type="button" id="contactCancel" class="btn-ghost">Cancel</button>
-        <button type="submit" class="btn-primary">Send Message</button>
-      </div>
-      <div id="contactMsg" class="hint" style="text-align: right;"></div>
-    </form>
-  </div>
+<div aria-hidden="true" class="modal" id="contactModal">
+<div aria-labelledby="contactTitle" aria-modal="true" class="modal-card" role="dialog">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h3 id="contactTitle" style="margin:0">Contact Me</h3>
+<button class="close" id="contactCloseBtn">×</button>
 </div>
-
+<form id="contactForm" style="margin-top:12px;display:grid;gap:8px">
+<input name="contact_name" placeholder="Your Name" required=""/>
+<input name="contact_email" placeholder="Your Email" required="" type="email"/>
+<input name="contact_mobile" placeholder="Your Mobile Number (Optional)"/>
+<textarea name="contact_message" placeholder="Your Message" required="" rows="4"></textarea>
+<div style="display:flex;gap:8px;justify-content:flex-end">
+<button class="btn-ghost" id="contactCancel" type="button">Cancel</button>
+<button class="btn-primary" type="submit">Send Message</button>
+</div>
+<div class="hint" id="contactMsg" style="text-align: right;"></div>
+</form>
+</div>
+</div>
 <script>
 // =================================================================================
 // COMPLETE SCRIPT (Firebase Firestore + EmailJS + Map + Chart + UI + Gallery + Quotes + Music embed + moderation)
