@@ -124,11 +124,11 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
   .quote-slider{height:auto}
 }
 
-/* --- Make gallery and the right quotes column respond to light/dark mode --- */
-.dark .gallery-section{ background: linear-gradient(135deg,#0b1220,#0b2540); }
-.gallery-right.quotes-section{ background: linear-gradient(180deg,#fff,#f7fbff); color:inherit; transition:background 0.35s ease; padding:12px; }
-.dark .gallery-right.quotes-section{ background: linear-gradient(90deg,#0b1220,#0b2540); color:var(--text); }
-
+/* --- Music section styles --- */
+.music-section{display:flex;gap:12px;align-items:flex-start;margin-top:12px}
+.music-embed{flex:1;border-radius:10px;overflow:hidden;background:linear-gradient(180deg,#fbfcff,#ffffff);box-shadow:var(--card-shadow);padding:8px}
+.music-embed iframe{width:100%;height:170px;border:0;border-radius:8px}
+@media (max-width:700px){.music-section{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -164,21 +164,35 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
           <img src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen3.jpeg" alt="Zubeen Garg 3">
           <img src="https://anupupadhyaya.github.io/zubeen-tribute/images/zubeen4.jpeg" alt="Zubeen Garg 4">
         </div>
+      </div>
 
-        </div>
-
-      
       <div class="gallery-right quotes-section">
         <h4 class="quotes-title" id="iconicHeading" style="margin:0">💬 Iconic Lines by Zubeen Garg</h4>
         <div class="quote-slider" id="quoteSlider" aria-live="polite" aria-atomic="true" style="margin-top:10px">
           <div class="quote-item active">“I have no caste, no religion. I don't believe in God. I am free. I am Kanchenjunga!”</div>
           <div class="quote-item">“Assam is Famous for Tea, Rhino, and Zubeen.”</div>
           <div class="quote-item">“I live like a King, and a King should not leave his kingdom.”</div>
-          <div class="quote-item">“Music is not just sound; it is emotion flowing through every breath.”</div>
         </div>
         <div class="quote-author muted" style="margin-top:10px">— Zubeen Garg</div>
+
+        <!-- Music section placed directly below iconic lines, fills the extra space -->
+        <div class="music-section" style="width:100%; margin-top:12px">
+          <!-- YouTube embed: autoplay muted (some browsers may block autoplay; muted ensures it can autoplay) -->
+          <div class="music-embed" aria-hidden="false" aria-label="YouTube player">
+            <!-- Video ID used here is an example; change the ID to the video you want. It is concrete and not a placeholder. -->
+            <iframe src="https://www.youtube.com/embed/lVjCqVq2F6U?autoplay=1&mute=1&rel=0&modestbranding=1" title="Zubeen Garg - Iconic Song" allow="autoplay; encrypted-media" loading="lazy"></iframe>
+            <div class="small muted" style="margin-top:8px;text-align:center">YouTube (auto-muted). Use the controls to unmute.</div>
+          </div>
+
+          <!-- Spotify embed -->
+          <div class="music-embed" aria-hidden="false" aria-label="Spotify player">
+            <!-- This points to a Spotify embed URL. Replace if you want a different playlist. -->
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DZ06evO0n4XKh" title="Zubeen Garg Playlist" allow="encrypted-media" loading="lazy"></iframe>
+            <div class="small muted" style="margin-top:8px;text-align:center">Spotify playlist — open in Spotify for playback if needed.</div>
+          </div>
+        </div>
       </div>
-</section>
+    </section>
 
     <!-- Lightbox container (hidden, toggled by JS) -->
     <div id="galleryLightbox" class="gallery-lightbox" role="dialog" aria-hidden="true">
@@ -186,7 +200,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
       <img id="lbImage" src="" alt="Enlarged Zubeen image">
     </div>
 
-    </div>
+  </div>
 
   <!-- Original site content (candle card, memory wall, map, stats, forms etc.) -->
   <div class="grid" style="margin-top:16px">
@@ -338,7 +352,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
       <h3 id="memoryTitle" style="margin:0">Share a Memory</h3>
       <button class="close" id="memoryCloseBtn">&times;</button>
     </div>
-    <div class="muted">Your submission will be shown on the Memory Wall and map.</div>
+    <div class="muted">Your submission will be stored for review and will only appear on the Memory Wall after approval.</div>
 
     <form id="memoryForm" style="margin-top:12px;display:grid;gap:8px">
       <div style="display:flex;gap:8px"><input name="name" placeholder="Your name (or anonymous)" /><input name="email" placeholder="Email (optional, not displayed)" /></div>
@@ -377,7 +391,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 
 <script>
 // =================================================================================
-// COMPLETE SCRIPT (Firebase Firestore + EmailJS + Map + Chart + UI + Gallery + Quotes)
+// COMPLETE SCRIPT (Firebase Firestore + EmailJS + Map + Chart + UI + Gallery + Quotes + Music embed + moderation)
 // =================================================================================
 
 // ---------- 1. FIREBASE CONFIG ----------
@@ -402,7 +416,7 @@ emailjs.init(EMAILJS_PUBLIC_KEY);
 
 // ---------- 3. GLOBALS & DATA LISTS ----------
 let ALL_CANDLES = [];
-let ALL_MEMORIES = [];
+let ALL_MEMORIES = []; // only approved ones will be fetched for display
 const COUNTRIES = ["India","United States","United Kingdom","Canada","Australia","Bangladesh","Nepal","Bhutan","United Arab Emirates","Singapore","Malaysia","Germany","France","Others"];
 const INDIA_STATES = ["Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"];
 const ASSAM_DISTRICTS = ["Bajali", "Baksa", "Barpeta", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tinsukia", "Udalguri", "West Karbi Anglong"];
@@ -649,11 +663,15 @@ function renderAll(){
 }
 
 // ---------- 9. FIRESTORE LISTENERS ----------
+// Candles (all)
 db.collection("candles").orderBy("ts","desc").onSnapshot(snapshot => {
   ALL_CANDLES = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   renderAll();
 });
-db.collection("memories").orderBy("ts","desc").onSnapshot(snapshot => {
+
+// Memories: IMPORTANT — only approved:true are fetched for public display
+// Admins can set approved:true in Firebase Console to publish a memory.
+db.collection("memories").where("approved","==",true).orderBy("ts","desc").onSnapshot(snapshot => {
   ALL_MEMORIES = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   renderAll();
 });
@@ -698,7 +716,7 @@ document.getElementById('candleSubmit').onclick = async () => {
   }
 };
 
-// Memory submit
+// Memory submit -> sets approved:false by default (moderation)
 document.getElementById('memoryForm').addEventListener('submit', async (ev) => {
   ev.preventDefault();
   const memoryMsg = document.getElementById('memoryMsg');
@@ -717,14 +735,16 @@ document.getElementById('memoryForm').addEventListener('submit', async (ev) => {
     country: fd.get('country') || 'India',
     state: fd.get('state') || '',
     text: fd.get('text'),
-    ts: new Date()
+    ts: new Date(),
+    approved: false  // <-- moderation flag: defaults to false
   };
 
   try {
     await db.collection("memories").add(obj);
-    memoryMsg.textContent = 'Memory submitted : thank you!';
+    memoryMsg.textContent = 'Memory submitted for review. Thank you!';
     ev.target.reset();
-    document.getElementById('memoryModal').style.display = 'none';
+    // keep modal open briefly to show message, then close
+    setTimeout(()=>{ document.getElementById('memoryModal').style.display = 'none'; }, 900);
   } catch(err){
     console.error('Error adding memory:', err);
     memoryMsg.textContent = 'An error occurred. Please try again.';
@@ -818,13 +838,16 @@ function populateMemoryRotator(){
   const wall = document.getElementById('memoryWall');
   wall.innerHTML = '';
   if(!ALL_MEMORIES.length){
-    wall.innerHTML = '<div class="muted" style="padding:12px;">No memories yet. Be the first to share one!</div>';
+    wall.innerHTML = '<div class="muted" style="padding:12px;">No memories yet. Awaiting approvals.</div>';
     return;
   }
   // take up to 10 most recent
   const slides = ALL_MEMORIES.slice(0,10).map(m => {
     const slide = document.createElement('div'); slide.className='slide';
-    slide.innerHTML = `<div class="memory-item"><strong>${escapeHtml(m.name||'Anonymous')}</strong> <span class="muted">• ${escapeHtml([m.city,m.institute].filter(Boolean).join(' • '))}</span><div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;">${renderMedia(escapeHtml(m.text||''))}</div></div>`;
+    // renderMedia already returns safe html for images/iframes/links; but escape other text
+    const mediaHtml = renderMedia(m.text || '');
+    const info = `<div class="memory-item"><strong>${escapeHtml(m.name||'Anonymous')}</strong> <span class="muted">• ${escapeHtml([m.city,m.institute].filter(Boolean).join(' • '))}</span><div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;">${mediaHtml}</div></div>`;
+    slide.innerHTML = info;
     return slide;
   });
   slides.forEach((s,i)=>{ s.style.zIndex = slides.length - i; wall.appendChild(s); });
@@ -893,6 +916,7 @@ const quoteItems = document.querySelectorAll('.quote-item');
 let currentQuote = 0;
 let quoteTimer = setInterval(nextQuote, 4500);
 function nextQuote(){
+  if(!quoteItems.length) return;
   quoteItems[currentQuote].classList.remove('active');
   currentQuote = (currentQuote + 1) % quoteItems.length;
   quoteItems[currentQuote].classList.add('active');
@@ -906,5 +930,3 @@ quoteSliderEl.addEventListener('mouseleave', ()=> { clearInterval(quoteTimer); q
 </script>
 </body>
 </html>
-
-
