@@ -913,23 +913,9 @@ quoteSliderEl.addEventListener('mouseenter', ()=> { clearInterval(quoteTimer); }
 quoteSliderEl.addEventListener('mouseleave', ()=> { clearInterval(quoteTimer); quoteTimer = setInterval(nextQuote,4500); });
 
 // ---------- 17. Safety: handle missing image/iframe URLs gracefully (already done in renderMedia) ----------
-<!-- Quotes slider auto-rotation script -->
-<script>
-const quotes = document.querySelectorAll('#quoteSlider .quote-item');
-let current = 0;
-
-setInterval(() => {
-  quotes[current].classList.remove('active');
-  current = (current + 1) % quotes.length;
-  quotes[current].classList.add('active');
-}, 4000); // changes every 4 seconds
-</script>
 
 </body>
 </html>
 
-</script>
-</body>
-</html>
 
 
