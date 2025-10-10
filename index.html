@@ -117,8 +117,10 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
   .gallery-section{grid-template-columns:1fr; padding:12px}
   .gallery-right{order:2}
   .gallery-grid img{height:140px}
-  .quotes-right{display:none}
   .quote-slider{height:auto}
+  .quote-slider { position: relative; height: auto; overflow: visible; }
+  .quote-item { position: static; transform: none; padding: 8px 14px; }
+  .quote-item.active { opacity:1; }
 }
 
 /* --- Music section styles --- */
@@ -233,7 +235,7 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 <div class="muted">Top 5 states (candles)</div><ol id="topStatesList"></ol>
 <div class="muted">Top Assam districts</div><ol id="topDistrictsList"></ol>
 </div>
-<div class="card" style="margin-top:12px">
+<div class="card" id="suggestionsCard" style="margin-top:12px">
 <div class="section-title">💡 Suggestions</div>
 <form id="suggestionForm">
 <textarea name="suggestion" placeholder="Have a suggestion to improve this site?" required="" rows="4"></textarea>
@@ -269,13 +271,11 @@ select:disabled{background:#eee;cursor:not-allowed}textarea{resize:vertical}
 <div class="music-section" style="width:100%; margin-top:12px">
 <!-- YouTube embed: autoplay muted (some browsers may block autoplay; muted ensures it can autoplay) -->
 <div aria-hidden="false" aria-label="YouTube player" class="music-embed">
-<!-- Video ID used here is an example; change the ID to the video you want. It is concrete and not a placeholder. -->
 <iframe allow="autoplay; encrypted-media" loading="lazy" src="https://www.youtube.com/embed/videoseries?list=PL3cTse0YhM79CcS9HP_BpzPkuJe94EYV7" title="Zubeen Garg - Iconic Song"></iframe>
 
 </div>
 <!-- Spotify embed -->
 <div aria-hidden="false" aria-label="Spotify player" class="music-embed">
-<!-- This points to a Spotify embed URL. Replace if you want a different playlist. -->
 <iframe allow="encrypted-media" loading="lazy" src="https://open.spotify.com/embed/artist/3mpgtUc7wYBNjr04gEiQ4u?utm_source=generator" title="Zubeen Garg Playlist"></iframe>
 
 </div>
@@ -891,7 +891,13 @@ function closeLightbox(){
 // ---------- 16. QUOTES SLIDER ----------
 const quoteItems = document.querySelectorAll('.quote-item');
 let currentQuote = 0;
-let quoteTimer = setInterval(nextQuote, 4500);
+let quoteTimer;
+const mediaQueryQuotes = window.matchMedia('(max-width: 980px)');
+if (mediaQueryQuotes.matches) {
+  quoteItems.forEach(item => item.classList.add('active'));
+} else {
+  quoteTimer = setInterval(nextQuote, 4500);
+}
 function nextQuote(){
   if(!quoteItems.length) return;
   quoteItems[currentQuote].classList.remove('active');
@@ -900,10 +906,31 @@ function nextQuote(){
 }
 // pause on hover
 const quoteSliderEl = document.getElementById('quoteSlider');
-quoteSliderEl.addEventListener('mouseenter', ()=> { clearInterval(quoteTimer); });
-quoteSliderEl.addEventListener('mouseleave', ()=> { clearInterval(quoteTimer); quoteTimer = setInterval(nextQuote,4500); });
+quoteSliderEl.addEventListener('mouseenter', ()=> { if(quoteTimer) clearInterval(quoteTimer); });
+quoteSliderEl.addEventListener('mouseleave', ()=> { if(quoteTimer) clearInterval(quoteTimer); if (!mediaQueryQuotes.matches) quoteTimer = setInterval(nextQuote,4500); });
 
 // ---------- 17. Safety: handle missing image/iframe URLs gracefully (already done in renderMedia) ----------
+
+// Move suggestions card on mobile
+const suggestionsCard = document.getElementById('suggestionsCard');
+const footer = document.querySelector('.footer');
+const aside = document.querySelector('aside');
+const mediaQuery = window.matchMedia('(max-width: 980px)');
+function handleMobileChange(e) {
+  if (e.matches) {
+    // Mobile view
+    if (suggestionsCard && footer) {
+      footer.parentNode.insertBefore(suggestionsCard, footer);
+    }
+  } else {
+    // Desktop view
+    if (suggestionsCard && aside) {
+      aside.appendChild(suggestionsCard);
+    }
+  }
+}
+handleMobileChange(mediaQuery);
+mediaQuery.addEventListener('change', handleMobileChange);
 </script>
 </body>
 </html>
